@@ -1,6 +1,7 @@
 /*jshint esversion:8 */
 
 const RELEASE="0.1";
+const SW_NAME = "/pwa9c/sw.js";
 
 const log = function (...args) {
   console.log(...args);
@@ -19,7 +20,6 @@ const app_log = function (txt) {
 };
 
 
-const SW_NAME = "/pwa9c/sw.js";
 
 let SW_STATE = "unregistred";
 
