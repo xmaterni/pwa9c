@@ -1,0 +1,107 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Author:G.Materni, Test PWA" />
+
+    <title>pwa9c</title>
+    <!-- <link rel="apple-touch-icon-precomposed" /> -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="menu_h.css">
+    <!--  -->
+    <!-- <link rel="stylesheet/less" type="text/css" href="style.less" />
+    <link rel="stylesheet/less" type="text/css" href="menu_h.less" />
+    <script type="text/javascript" src="uajs/less.js"></script> -->
+    <!--  -->
+    <script type="text/javascript" src="uajs/uawindow.js"></script>
+    <script type="text/javascript" src="uajs/uadrag.js"></script>
+    <script type="text/javascript" src="uajs/ualog.js"></script>
+    <script type="text/javascript" src="uajs/uajthl.js"></script>
+    <!--  -->
+    <script type="text/javascript" src="index.js"></script>
+    <!--  -->
+    <!--  -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#f3ff08" />
+    <!--  -->
+    <script src="app.js" defer></script>
+  </head>
+
+  <body>
+    <div class="menu-h">
+      <div class="menu-logo">
+        <span> Test Menu_HR </span>
+      </div>
+      <input id="id-menu-btn" name="id-menu-btn" class="menu-btn" type="checkbox" />
+      <label for="id-menu-btn" class="menu-icon">
+        <span class="nav-icon"></span>
+      </label>
+
+      <div class="menu-boxes">
+        <div class="menu-box">
+          <ul>
+            <li class="menu-title">Menu</li>
+            <li><a href="#" onClick="msg_clear('item1');">clear</a></li>
+            <li><a href="#" onClick="fn0();">anag.json</a></li>
+            <li><a href="#" onClick="fn1();">anag.json</a></li>
+            <li><a href="#" onClick="fn2();">anag20.json</a></li>
+            <li><a href="#" onClick="fn5('fox1');">image1</a></li>
+            <li><a href="#" onClick="fn5('fox2');">image2</a></li>
+            <li><a href="#" onClick="fn5('fox3');">image3</a></li>
+            <li><a href="#" onClick="fn5('fox4');">image4</a></li>
+
+            <li class="menu-title">Log</li>
+            <li><a href="#" onClick="UaLog.toggle();">Toggle Log</a></li>
+            <li><a href="#" onClick="toggleUaLog();">Toggle SW Log</a></li>
+            <li><a href="#" onClick="fn3();">test prn</a></li>
+            <li><a href="#" onClick="fn4();">test log</a></li>
+            <li><a href="#" onClick="toggle_test();">toggle test</a></li>
+          </ul>
+        </div>
+        <div class="menu-box">
+          <ul>
+            <li class="menu-title">SW</li>
+            <li><a href="#" onCLick="readCache();">Read cache</a></li>
+            <li><a href="#" onClick="clearCaches();">clearCaches</a></li>
+            <li><a href="#" onClick="unregist();">unregist</a></li>
+            <li class="menu-title">Update SW</li>
+            <li><a class="aaa0" href="#" onClick="reload();">Reload</a></li>
+            <li><a class="aaa1" href="#" onClick="reset();">Reset</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div id="item0" class="item item0"></div>
+      <div id="item1" class="item item1"></div>
+      <div class="item item2 test_media"></div>
+    </div>
+  </body>
+</html>
+<script>
+  UaLog.setXY(150, 0).setZ(11).new();
+
+  (function () {
+    const bt = document.querySelector("#id-menu-btn");
+    const mc = document.querySelector("div.menu-boxes");
+    const alst = document.querySelectorAll(".menu-h a");
+    for (const a of alst)
+      a.addEventListener("click", (e) => {
+        bt.checked = false;
+      });
+    // gestione hover
+    // const bl = document.querySelector(".menu-h .menu-lbl");
+    // bl.addEventListener("mouseenter", (e) => {
+    //   bt.checked = true;
+    // });
+    // const bx = document.querySelector(".menu-h .menu-box");
+    // bx.addEventListener("mouseleave", (e) => {
+    //   bt.checked = false;
+    // });
+  })();
+</script>

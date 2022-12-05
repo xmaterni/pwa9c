@@ -1,0 +1,47 @@
+{
+  "manifest_version": 2,
+  "version": "1.0.2",
+  "name": "pwa9c",
+  "short_name": "pwa9c",
+  "description": "Progressive Web App pwa9c",
+  "start_url": "/pwa9c/index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#028838",
+  "background_color": "#ff4500",
+  "icons": [
+    {
+      "src": "icons/icon07_x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon07_x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon07_x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/maskable_icon_x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/maskable_icon_x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/maskable_icon_x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

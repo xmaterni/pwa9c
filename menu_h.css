@@ -1,0 +1,172 @@
+/** @format */
+.b0 {
+  background-color: red;
+}
+.b1 {
+  background-color: green;
+}
+.b2 {
+  background-color: #5b5bd8;
+  color: white;
+}
+.brd0 {
+  border: 1px solid red;
+}
+.brd1 {
+  border: 1px solid green;
+}
+.brd2 {
+  border: 1px solid #eeec53;
+}
+div.menu-h {
+  background-color: #0d0d0d;
+  box-sizing: border-box;
+  font-size: clamp(0.8rem, 1.5vw, 1.5rem);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 35px;
+  z-index: 1;
+}
+div.menu-h .menu-logo {
+  display: block;
+  text-align: center;
+  padding-top: 1vh;
+}
+div.menu-h .menu-logo span {
+  background-color: #0d0d0d;
+  color: #edda0a;
+  font-size: clamp(1.2rem, 1.6vw, 1.7rem);
+  font-weight: bold;
+}
+div.menu-h .menu-btn {
+  appearance: none;
+}
+div.menu-h .menu-btn:checked ~ div.menu-boxes {
+  left: 0 !important;
+}
+div.menu-h .menu-btn:checked + .menu-icon {
+  border: 1px solid #4d4d4d;
+}
+div.menu-h .menu-btn:checked + .menu-icon .nav-icon {
+  transform: rotate(45deg);
+}
+div.menu-h .menu-btn:checked + .menu-icon .nav-icon::before {
+  top: 0;
+}
+div.menu-h .menu-btn:checked + .menu-icon .nav-icon::after {
+  top: 0;
+  transform: rotate(90deg);
+}
+div.menu-h .menu-icon {
+  box-sizing: border-box;
+  background-color: inherit;
+  display: block;
+  position: absolute;
+  top: 5px;
+  left: 10px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  padding: 2px 2px;
+  z-index: 1;
+}
+div.menu-h .menu-icon .nav-icon {
+  background-color: #aea7a7;
+  display: block;
+  position: absolute;
+  top: 14px;
+  left: 0;
+  width: 28px;
+  height: 3px;
+  transition-duration: 0.25s;
+}
+div.menu-h .menu-icon .nav-icon::before,
+div.menu-h .menu-icon .nav-icon::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  background-color: inherit;
+  width: inherit;
+  height: inherit;
+}
+div.menu-h .menu-icon .nav-icon::before {
+  top: -8px;
+}
+div.menu-h .menu-icon .nav-icon::after {
+  top: 8px;
+}
+div.menu-h .menu-test {
+  left: 0 !important;
+}
+div.menu-h div.menu-boxes {
+  box-sizing: border-box;
+  background-color: #0d0d0d;
+  position: absolute;
+  margin-top: 35px;
+  top: 0;
+  left: -2000px;
+  transition: left 0.5s ease-out;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: stretch;
+}
+div.menu-h div.menu-boxes .aaa0 {
+  background-color: #d9e760 !important;
+  color: #000000 !important;
+}
+div.menu-h div.menu-boxes .aaa1 {
+  background-color: #ff3107 !important;
+  color: #fffcfc !important;
+}
+div.menu-h div.menu-boxes div.menu-box {
+  min-width: 150px;
+  max-width: 190px;
+  max-height: 80vh;
+  font-size: clamp(0.8rem, 1.5vw, 1.5rem);
+  background-color: #1a1a1a;
+  box-sizing: border-box;
+  flex: 1;
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+div.menu-h div.menu-boxes div.menu-box .menu-title {
+  padding: 2px 0;
+  background-color: #333333;
+  color: #ffffff;
+  border-right: 1px solid #4d4d4d;
+  text-align: center;
+  font-style: italic;
+}
+div.menu-h div.menu-boxes div.menu-box ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #4d4d4d;
+}
+div.menu-h div.menu-boxes div.menu-box ul li {
+  box-sizing: border-box;
+  border-left: 1px solid #4d4d4d;
+  border-right: 1px solid #4d4d4d;
+  border-bottom: 1px solid #4d4d4d;
+}
+div.menu-h div.menu-boxes div.menu-box ul li a {
+  white-space: nowrap;
+  color: #fafafa;
+  display: block;
+  margin: 0;
+  padding: 5px 5px;
+  text-align: left;
+  text-decoration: none;
+}
+div.menu-h div.menu-boxes div.menu-box ul li a:hover {
+  text-decoration: underline;
+  background-color: #333333;
+  color: #ffffff;
+}

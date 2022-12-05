@@ -1,0 +1,228 @@
+/** @format */
+.b0 {
+  background-color: red;
+}
+
+.b1 {
+  background-color: green;
+}
+
+.b2 {
+  background-color: #5b5bd8;
+  color: white;
+}
+
+.brd0 {
+  border: 1px solid red;
+}
+
+.brd1 {
+  border: 1px solid green;
+}
+
+.brd2 {
+  border: 1px solid #eeec53;
+}
+
+@bck-menu: #000000;
+@bck-menu-logo: lighten(@bck-menu, 5%);
+@bck-menu-boxes: lighten(@bck-menu, 5%);
+@bck-menu-title: lighten(@bck-menu, 20%);
+@bck-menu-box: lighten(@bck-menu, 10%);
+@bck-menu-hover: lighten(@bck-menu, 20%);
+
+@color-menu: #fafafa;
+@color-menu-logo: #edda0a;
+@color-menu-icon: #aea7a7;
+@color-menu-title: #ffffff;
+@color-menu-border: lighten(@bck-menu, 30%);
+@color-menu-hover: #ffffff;
+
+@fsize-menu: clamp(0.8rem, 1.5vw, 1.5rem);
+@fsize-menu-logo: clamp(1.2rem, 1.6vw, 1.7rem);
+
+div.menu-h {
+  background-color: @bck-menu-boxes;
+  box-sizing: border-box;
+  font-size: @fsize-menu;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 35px;
+  z-index: 1;
+
+  .menu-logo {
+    display: block;
+    text-align: center;
+    padding-top: 1vh;
+
+    span {
+      background-color: @bck-menu-logo;
+      color: @color-menu-logo;
+      font-size: @fsize-menu-logo;
+      font-weight: bold;
+    }
+  }
+
+  .menu-btn {
+    appearance: none;
+  }
+
+  .menu-btn:checked {
+    & ~ div.menu-boxes {
+      left: 0 !important;
+    }
+  }
+
+  .menu-btn:checked {
+    & + .menu-icon {
+      border: 1px solid @color-menu-border;
+
+      .nav-icon {
+        transform: rotate(45deg);
+      }
+
+      .nav-icon::before {
+        top: 0;
+      }
+
+      .nav-icon::after {
+        top: 0;
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  .menu-icon {
+    box-sizing: border-box;
+    background-color: inherit;
+    display: block;
+    position: absolute;
+    top: 5px;
+    left: 10px;
+    // right: 10px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    padding: 2px 2px;
+    z-index: 1;
+
+    .nav-icon {
+      background-color: @color-menu-icon;
+      display: block;
+      position: absolute;
+      top: 14px;
+      left: 0;
+      width: 28px;
+      height: 3px;
+      transition-duration: 0.25s;
+    }
+
+    .nav-icon::before,
+    .nav-icon::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      background-color: inherit;
+      width: inherit;
+      height: inherit;
+    }
+
+    .nav-icon::before {
+      top: -8px;
+    }
+
+    .nav-icon::after {
+      top: 8px;
+    }
+  }
+
+  .menu-test {
+    left: 0 !important;
+  }
+
+  div.menu-boxes {
+    // .brd0;
+    box-sizing: border-box;
+    // min-height: 100vh;
+    background-color: @bck-menu-boxes;
+    position: absolute;
+    margin-top: 35px;
+    // padding-top: 30px;
+    // padding-left: 40px;
+    top: 0;
+    left: -2000px;
+    transition: left 0.5s ease-out;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    // overflow-y: auto;
+    // overflow-x: auto;
+
+    .aaa0 {
+      background-color: #d9e760 !important;
+      color: #000000 !important;
+    }
+    .aaa1 {
+      background-color: #ff3107 !important;
+      color: #fffcfc !important;
+    }
+
+    div.menu-box {
+      min-width: 150px;
+      max-width: 190px;
+      max-height: 80vh;
+      font-size: @fsize-menu;
+      background-color: @bck-menu-box;
+      box-sizing: border-box;
+      flex: 1;
+      padding: 0;
+      overflow-y: auto;
+      overflow-x: auto;
+
+      .menu-title {
+        padding: 2px 0;
+        background-color: @bck-menu-title;
+        color: @color-menu-title;
+        border-right: 1px solid @color-menu-border;
+        text-align: center;
+        font-style: italic;
+      }
+
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        border-top: 1px solid @color-menu-border;
+
+        li {
+          box-sizing: border-box;
+          border-left: 1px solid @color-menu-border;
+          border-right: 1px solid @color-menu-border;
+          border-bottom: 1px solid @color-menu-border;
+
+          a {
+            white-space: nowrap;
+            color: @color-menu;
+            display: block;
+            margin: 0;
+            padding: 5px 5px;
+            text-align: left;
+            text-decoration: none;
+          }
+
+          a:hover {
+            text-decoration: underline;
+            background-color: @bck-menu-hover;
+            color: @color-menu-hover;
+          }
+        }
+      }
+    }
+  }
+}
