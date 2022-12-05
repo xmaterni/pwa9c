@@ -1,6 +1,6 @@
 /*jshint esversion:8 */
 
-const RELEASE="0.1.2";
+const RELEASE="0.1.3";
 const SW_NAME = "/pwa9c/sw.js";
 
 const log = function (...args) {
