@@ -1,6 +1,6 @@
 /*jshint esversion:8 */
 
-const RELEASE="0.1";
+const RELEASE="0.1.1";
 const SW_NAME = "/pwa9c/sw.js";
 
 const log = function (...args) {
@@ -157,7 +157,7 @@ function toggleUaLog() {
   postMessageToWorker(msg);
 }
 
-function readCache() {
+function readCacheSW() {
   const msg = buildMessageToWorker("read_cache",);
   postMessageToWorker(msg);
 }

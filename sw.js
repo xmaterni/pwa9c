@@ -1,7 +1,7 @@
 /*jshint esversion:8 */
 // "use strict";
 
-const CACHE_NAME = "pwa9c_2";
+const CACHE_NAME = "pwa9c_1";
 
 let UALOG_STATUS = true;
 
