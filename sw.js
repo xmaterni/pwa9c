@@ -3,11 +3,11 @@
 
 const CACHE_NAME = "pwa9c_1";
 
-let UALOG_STATUS = true;
+let ualog_status = true;
 
 const swlog = function (txt) {
     console.log(txt);
-    if (UALOG_STATUS) {
+    if (ualog_status) {
         const msg = buildPushMsgToClients(txt, "log");
         postMessageToClients(msg);
     }
@@ -66,7 +66,7 @@ self.addEventListener('message', (event) => {
             postMessageToClients(msg);
         }
         else if (rqs_cmd == "toggle_ualog") {
-            UALOG_STATUS = !UALOG_STATUS;
+            ualog_status = !ualog_status;
         }
         else if (rqs_cmd == "read_cache") {
             readCache().then((urls) => {

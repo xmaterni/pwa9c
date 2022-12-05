@@ -101,11 +101,11 @@ const fn4 = function () {
 const fn5 = function (name) {
     document.getElementById(item1).innerHTML = "";
     const img = document.createElement("img");
-    img.src = "/pwaes4/imgs/" + name + ".jpg";
+    img.src = "/pwa9c/imgs/" + name + ".jpg";
     // img.style.height = "100%";
     img.style.width = "100%";
     document.getElementById(item1).appendChild(img);
-    const audio = new Audio("/pwaes4/sounds/" + name + ".mp3");
+    const audio = new Audio("/pwa9c/sounds/" + name + ".mp3");
     audio.play();
 };
 
