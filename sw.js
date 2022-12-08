@@ -1,6 +1,38 @@
 /*jshint esversion:8 */
 // "use strict";
 
+
+////////////////
+// log
+///////////////
+
+const swlog = function (txt) {
+    console.log(txt);
+    if (ualog_status) {
+        const msg = buildPushMsgToClients(txt, "log");
+        postMessageToClients(msg);
+    }
+};
+
+const logRequest = function (request) {
+    swlog("-----------------------------");
+    swlog("url:" + request.url);
+    swlog("destination:" + request.destination);
+    // const s = JSON.stringify(request.headers);
+    // swlog("SW headers:" + s);
+    swlog("method:" + request.method);
+    swlog("mode:" + request.mode);
+    // swlog("SW cache:" + request.cache);
+    const url = new URL(request.url);
+    // swlog("hostname:" + url.hostname);
+    // swlog("host:" + url.host);
+    // swlog("port:" + url.port);
+    swlog("pathname:" + url.pathname);
+    swlog("origin:" + url.origin);
+    swlog(".............................");
+};
+
+
 ////////////////////
 //dialogo app-sw
 ////////////////////
@@ -20,7 +52,6 @@ rqs_cmd=push (simulato)
 
 const CACHE_NAME = "pwa9c_1";
 let ualog_status = true;
-
 
 const config = {
     version: "sw_3",
@@ -68,6 +99,8 @@ const config = {
     ]
 };
 
+// listener
+
 self.addEventListener('install', (event) => {
     swlog("install " + config.version);
     event.waitUntil(caches.open(CACHE_NAME)
@@ -94,65 +127,6 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-
-////////////////
-// log
-///////////////
-
-const swlog = function (txt) {
-    console.log(txt);
-    // if (ualog_status) {
-    //     const msg = buildPushMsgToClients(txt, "log");
-    //     postMessageToClients(msg);
-    // }
-};
-
-const logRequest = function (request) {
-    swlog("-----------------------------");
-    swlog("url:" + request.url);
-    swlog("destination:" + request.destination);
-    // const s = JSON.stringify(request.headers);
-    // swlog("SW headers:" + s);
-    swlog("method:" + request.method);
-    swlog("mode:" + request.mode);
-    // swlog("SW cache:" + request.cache);
-    const url = new URL(request.url);
-    // swlog("hostname:" + url.hostname);
-    // swlog("host:" + url.host);
-    // swlog("port:" + url.port);
-    swlog("pathname:" + url.pathname);
-    swlog("origin:" + url.origin);
-    swlog(".............................");
-};
-
-
-//////////////////////
-// getsione messaggi
-//////////////////////
-
-//messaggio inviato al client dal SW
-const buildPushMsgToClients = function (rsp_data, rsp_cmd = "") {
-    const msg = {
-        rqs_cmd: "push",
-        rsp_cmd: rsp_cmd,
-        rsp_data: rsp_data
-    };
-    return msg;
-};
-
-//messaggio di risposta ad una request
-const buildRspMsgToClients = function (rsp_data, rqs = {}) {
-    const rqs_cmd = rqs.rqs_cmd || "none";
-    const rsp_cmd = rqs.rsp_cmd || "none";
-    const msg = {
-        rqs_cmd: rqs_cmd,
-        rsp_cmd: rsp_cmd,
-        rsp_data: rsp_data
-    };
-    return msg;
-};
-
-// receives message
 self.addEventListener('message', (event) => {
     if (event.data) {
         const rqs = event.data || {};
@@ -182,7 +156,6 @@ self.addEventListener('message', (event) => {
                     postMessageToClients(msg);
 
                 });
-
         }
         else {
             const s = `SW Error listener(messag)<br>
@@ -191,48 +164,6 @@ self.addEventListener('message', (event) => {
         }
     }
 });
-
-// post message
-const postMessageToClients = function (message) {
-    return self.clients.matchAll().then(clients => {
-        return Promise.all(clients.map(client => {
-            return client.postMessage(message);
-        }));
-    });
-};
-
-/////////////////////
-// gestione cache
-/////////////////////
-
-const readCache = () => {
-    swlog("readCache");
-    return caches.open(CACHE_NAME).then((cache) => {
-        return cache.keys();
-    }).then((requests) => {
-        const lst = [];
-        for (let rqs of requests)
-            lst.push(rqs.url);
-        return lst;
-    });
-};
-
-
-const readCacheUrl = (url) => {
-    swlog("readCacheUrl");
-    // const ops = {
-    //     ignoreSearch: true,
-    //     ignoreMethod: true,
-    //     ignoreVary: true
-    // };
-    return caches.open(CACHE_NAME).then((cache) => {
-        console.log(url);
-        return cache.match(url);
-    }).then((response) => {
-        return response;
-    });
-};
-
 
 ///////////////////////
 // fetch
@@ -273,6 +204,9 @@ self.addEventListener('fetch', (event) => {
     }
 });
 
+//////////////////
+//fetch strtegy
+////////////////
 const networkOnly = (event) => {
     event.respondWith(fetch(event.request));
 };
@@ -341,5 +275,70 @@ const staleWhileRevalidate = (event) => {
                     }
                 });
         }));
+};
+
+/////////////////////////
+// gestione messaggi
+
+//messaggio inviato al client dal SW
+const buildPushMsgToClients = function (rsp_data, rsp_cmd = "") {
+    const msg = {
+        rqs_cmd: "push",
+        rsp_cmd: rsp_cmd,
+        rsp_data: rsp_data
+    };
+    return msg;
+};
+
+//messaggio di risposta ad una request
+const buildRspMsgToClients = function (rsp_data, rqs = {}) {
+    const rqs_cmd = rqs.rqs_cmd || "none";
+    const rsp_cmd = rqs.rsp_cmd || "none";
+    const msg = {
+        rqs_cmd: rqs_cmd,
+        rsp_cmd: rsp_cmd,
+        rsp_data: rsp_data
+    };
+    return msg;
+};
+
+// post message
+const postMessageToClients = function (message) {
+    return self.clients.matchAll().then(clients => {
+        return Promise.all(clients.map(client => {
+            return client.postMessage(message);
+        }));
+    });
+};
+
+/////////////////////
+// funzioni varrie
+/////////////////////
+
+const readCache = () => {
+    swlog("readCache");
+    return caches.open(CACHE_NAME).then((cache) => {
+        return cache.keys();
+    }).then((requests) => {
+        const lst = [];
+        for (let rqs of requests)
+            lst.push(rqs.url);
+        return lst;
+    });
+};
+
+const readCacheUrl = (url) => {
+    swlog("readCacheUrl");
+    // const ops = {
+    //     ignoreSearch: true,
+    //     ignoreMethod: true,
+    //     ignoreVary: true
+    // };
+    return caches.open(CACHE_NAME).then((cache) => {
+        console.log(url);
+        return cache.match(url);
+    }).then((response) => {
+        return response;
+    });
 };
 

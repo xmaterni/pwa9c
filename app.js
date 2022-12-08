@@ -56,7 +56,11 @@ if ("serviceWorker" in navigator) {
         log('waiting');
       } else if (registration.active) {
         sw = registration.active;
+        //listen to messages
         navigator.serviceWorker.onmessage = receivesMessage;
+        // navigator.serviceWorker.onmessage = (event) => {
+        //   receivesMessage(event);
+        // };
         SW_STATE = "active";
         log('active');
       }
@@ -77,31 +81,9 @@ if ("serviceWorker" in navigator) {
   alert(`Erroro(1) app-js \n${SW_NAME} not in navigator`);
 }
 
-const json2str = function (js, ln = '\n') {
-  const es = Object.entries(js);
-  const lst = es.map((kv) => `${kv[0]}:${kv[1]}`);
-  return lst.join(ln);
-};
-
-
-const buildMessageToWorker = function (rqs_cmd, rsp_cmd = "", data = "") {
-  const msg = {
-    rqs_cmd: rqs_cmd,
-    rsp_cmd: rsp_cmd,
-    rqs_data: data
-  };
-  return msg;
-};
-
-//post message to worker
-const postMessageToWorker = function (msg) {
-  if (navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage(msg);
-  } else {
-    alert(`Error(4) app.js ServiceWorker not activated \n ${SW_NAME}`);
-  }
-};
-
+///////////////////
+//gestione messaggi
+////////////////////
 
 const receivesMessage = function (event) {
   const msg = event.data;
@@ -147,6 +129,35 @@ const receivesMessage = function (event) {
   }
 
 };
+
+// const json2str = function (js, ln = '\n') {
+//   const es = Object.entries(js);
+//   const lst = es.map((kv) => `${kv[0]}:${kv[1]}`);
+//   return lst.join(ln);
+// };
+
+
+const buildMessageToWorker = function (rqs_cmd, rsp_cmd = "", data = "") {
+  const msg = {
+    rqs_cmd: rqs_cmd,
+    rsp_cmd: rsp_cmd,
+    rqs_data: data
+  };
+  return msg;
+};
+
+//post message to worker
+const postMessageToWorker = function (msg) {
+  if (navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage(msg);
+  } else {
+    alert(`Error(4) app.js ServiceWorker not activated \n ${SW_NAME}`);
+  }
+};
+
+//////////////////
+// funzioni varie
+//////////////////
 
 function unregist() {
   if ('serviceWorker' in navigator) {
@@ -224,3 +235,5 @@ function testFnRspShow(msg) {
   const s = JSON.stringify(rsp_data);
   msg_prn(item1, s);
 }
+
+
