@@ -109,7 +109,8 @@ const fn5 = function (name) {
     audio.play();
 };
 
-const toggle_test = function () {
+//blocca-sblocca menu
+const fix_unfix_menu = function () {
     const e = document.querySelector("div.menu-boxes");
     e.classList.toggle("menu-test");
 };

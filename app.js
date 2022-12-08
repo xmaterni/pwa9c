@@ -1,6 +1,23 @@
 /*jshint esversion:8 */
 
-const RELEASE="0.1.3";
+////////////////////
+//dialogo app-sw
+////////////////////
+/*
+REQUEST => buildRspMsgToClients
+rqs_cmd:test
+  rsp_cmd:log
+  rsp_cmd:prn
+rqs_cmd:toggle_ualog
+rqs_cmd:read_cache
+ 
+PUSH  => buildPushMsgToClients 
+rqs_cmd=push (simulato)
+    rsp_cmd=log (SW)
+
+    */
+
+const RELEASE = "0.1.3";
 const SW_NAME = "/pwa9c/sw.js";
 
 const log = function (...args) {
@@ -48,7 +65,7 @@ if ("serviceWorker" in navigator) {
           log('statechange', e.target.state);
         });
       }
-      const msg=`SW ${SW_NAME}
+      const msg = `SW ${SW_NAME}
       &nbsp;&nbsp;&nbsp;&nbsp;(${RELEASE})&nbsp;&nbsp;&nbsp;&nbsp;
       ${SW_STATE.toUpperCase()}`;
       app_info(msg);
@@ -85,11 +102,13 @@ const postMessageToWorker = function (msg) {
   }
 };
 
+
 const receivesMessage = function (event) {
   const msg = event.data;
   const rqs_cmd = msg.rqs_cmd || "";
   const rsp_cmd = msg.rsp_cmd || "";
   const rsp_data = msg.rsp_data || "";
+
   if (rqs_cmd == "push") {
     if (rsp_cmd == "log") {
       ualog(rsp_data);
@@ -101,6 +120,7 @@ const receivesMessage = function (event) {
       alert(s);
     }
   }
+  // 
   else if (rqs_cmd == "test") {
     if (rsp_cmd == "log") {
       ualog(rsp_data);
@@ -117,6 +137,7 @@ const receivesMessage = function (event) {
     rqs_cmd:${rqs_cmd} Not Found`;
     alert(s);
   }
+
 };
 
 function unregist() {
