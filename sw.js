@@ -176,8 +176,7 @@ self.addEventListener('message', (event) => {
         else if (rqs_cmd == "read_cache_url") {
             readCacheUrl(rqs_data)
                 .then((rsp) => {
-                    console.log(rsp);
-                    return rsp.text();
+                    return rsp.json();
                 }).then((js) => {
                     const msg = buildRspMsgToClients(js, rqs);
                     postMessageToClients(msg);

@@ -220,6 +220,7 @@ function testFnRsp(msg) {
 }
 
 function testFnRspShow(msg) {
-  const rsp_data = msg.rsp_data || [];
-  msg_prn(item1, rsp_data);
+  const rsp_data = msg.rsp_data || {};
+  const s = JSON.stringify(rsp_data);
+  msg_prn(item1, s);
 }
