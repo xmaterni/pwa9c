@@ -66,7 +66,7 @@ if ("serviceWorker" in navigator) {
       }
       if (sw) {
         sw.addEventListener("statechange", (e) => {
-          log('statechange', e.target.state);
+          log(`statechange ${e.target.state}`);
         });
       }
       const msg = `SW ${SW_NAME}
