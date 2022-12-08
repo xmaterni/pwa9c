@@ -130,7 +130,15 @@ const receivesMessage = function (event) {
     }
   }
   else if (rqs_cmd == "read_cache") {
-    showReadCacheRsp(msg);
+    if (rsp_cmd == "testFn") {
+      testFnRsp(msg);
+    }
+    else {
+      showReadCacheRsp(msg);
+    }
+  }
+  else if (rqs_cmd == "read_cache_url") {
+    testFnRspShow(msg);
   }
   else {
     const s = `ReceiveMessage Error 
@@ -181,6 +189,7 @@ function toggleUaLog() {
 function readCacheSW() {
   const msg = buildMessageToWorker("read_cache",);
   postMessageToWorker(msg);
+  // => showReadCacheResp(msg_rsp)
 }
 
 function showReadCacheRsp(msg) {
@@ -188,4 +197,29 @@ function showReadCacheRsp(msg) {
   showList(rsp_data);
   // const html = json2str(rsp_data, "<br>");
   // app_log(html);
+}
+
+function testFn() {
+  const msg = buildMessageToWorker("read_cache", "testFn");
+  postMessageToWorker(msg);
+  // => testFnRsp(msg_rsp)
+}
+
+function testFnRsp(msg) {
+  const urls = msg.rsp_data || [];
+  let url = "";
+  for (let u of urls) {
+    if (u.indexOf("20") > -1) {
+      url = u;
+      break;
+    }
+  }
+  const msg2 = buildMessageToWorker("read_cache_url", "", url);
+  postMessageToWorker(msg2);
+  //=> testFnRspShow
+}
+
+function testFnRspShow(msg) {
+  const rsp_data = msg.rsp_data || [];
+  msg_prn(item1, rsp_data);
 }

@@ -115,7 +115,6 @@ const fix_unfix_menu = function () {
     e.classList.toggle("menu-test");
 };
 
-
 const showList = function (lst) {
     const templ = (d) => {
         return `

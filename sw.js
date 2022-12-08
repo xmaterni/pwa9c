@@ -101,10 +101,10 @@ self.addEventListener('activate', (event) => {
 
 const swlog = function (txt) {
     console.log(txt);
-    if (ualog_status) {
-        const msg = buildPushMsgToClients(txt, "log");
-        postMessageToClients(msg);
-    }
+    // if (ualog_status) {
+    //     const msg = buildPushMsgToClients(txt, "log");
+    //     postMessageToClients(msg);
+    // }
 };
 
 const logRequest = function (request) {
@@ -173,6 +173,18 @@ self.addEventListener('message', (event) => {
                 postMessageToClients(msg);
             });
         }
+        else if (rqs_cmd == "read_cache_url") {
+            readCacheUrl(rqs_data)
+                .then((rsp) => {
+                    console.log(rsp);
+                    return rsp.text();
+                }).then((js) => {
+                    const msg = buildRspMsgToClients(js, rqs);
+                    postMessageToClients(msg);
+
+                });
+
+        }
         else {
             const s = `SW Error listener(messag)<br>
              rqs_cmd: ${rqs_cmd} Not Found.`;
@@ -207,21 +219,20 @@ const readCache = () => {
 };
 
 
-// const readCacheUrl = (url) => {
-//     swlog("readCacheUrl");
-//     const ops = {
-//         ignoreSearch: true,
-//         ignoreMethod: true,
-//         ignoreVary: true
-//     };
-//     return caches.open(CACHE_NAME).then((cache) => {
-//         return cache.match(url, ops);
-//     }).then((response) => {
-//         return response.text();
-//     }).then((text) => {
-//         swlog(text);
-//     });
-// };
+const readCacheUrl = (url) => {
+    swlog("readCacheUrl");
+    // const ops = {
+    //     ignoreSearch: true,
+    //     ignoreMethod: true,
+    //     ignoreVary: true
+    // };
+    return caches.open(CACHE_NAME).then((cache) => {
+        console.log(url);
+        return cache.match(url);
+    }).then((response) => {
+        return response;
+    });
+};
 
 
 ///////////////////////
