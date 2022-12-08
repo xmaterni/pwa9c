@@ -40,13 +40,13 @@ const fn0 = function () {
 
 const fn1 = function () {
     fetch("data/anag.json")
-        .then(function (response) {
+        .then((response) => {
             if (!response.ok) {
                 throw new Error("HTTP error, status = " + response.status);
             }
             return response.json();
         })
-        .then(function (data) {
+        .then((data) => {
             const fnh = (d) => {
                 return `
                 <br/> 

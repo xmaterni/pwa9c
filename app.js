@@ -56,13 +56,13 @@ if ("serviceWorker" in navigator) {
         log('waiting');
       } else if (registration.active) {
         sw = registration.active;
+        SW_STATE = "active";
+        log('active');
         //listen to messages
         // navigator.serviceWorker.onmessage = receivesMessage;
         navigator.serviceWorker.onmessage = (event) => {
           receivesMessage(event);
         };
-        SW_STATE = "active";
-        log('active');
       }
       if (sw) {
         sw.addEventListener("statechange", (e) => {
