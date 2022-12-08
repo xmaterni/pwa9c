@@ -17,7 +17,7 @@ rqs_cmd=push (simulato)
 
     */
 
-const RELEASE = "0.1.3";
+const RELEASE = "0.1.6";
 const SW_NAME = "/pwa9c/sw.js";
 
 const log = function (...args) {
@@ -57,10 +57,10 @@ if ("serviceWorker" in navigator) {
       } else if (registration.active) {
         sw = registration.active;
         //listen to messages
-        navigator.serviceWorker.onmessage = receivesMessage;
-        // navigator.serviceWorker.onmessage = (event) => {
-        //   receivesMessage(event);
-        // };
+        // navigator.serviceWorker.onmessage = receivesMessage;
+        navigator.serviceWorker.onmessage = (event) => {
+          receivesMessage(event);
+        };
         SW_STATE = "active";
         log('active');
       }
