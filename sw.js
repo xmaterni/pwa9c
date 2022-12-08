@@ -41,7 +41,7 @@ const buildPushMsgToClients = function (rsp_data, rsp_cmd = "") {
     return msg;
 };
 
-//messaggio di risposta ad una reques
+//messaggio di risposta ad una reques4
 const buildRspMsgToClients = function (rsp_data, rqs = {}) {
     const rqs_cmd = rqs.rqs_cmd || "none";
     const rsp_cmd = rqs.rsp_cmd || "none";
@@ -110,28 +110,29 @@ const config = {
         // "./",
         "/pwa9c/index.html",
 
-        // "/pwa9c/style.less",
-        // "/pwa9c/menu_h.less",
-        // "/pwa9c/uajs/less.js",
-        "/pwa9c/style.css",
-        "/pwa9c/menu_h.css",
+        "/pwa9c/style.less",
+        "/pwa9c/menu_h.less",
+        "/pwa9c/uajs/less.js",
+        // "/pwa9c/style.css",
+        // "/pwa9c/menu_h.css",
 
         "/pwa9c/index.js",
         "/pwa9c/app.js",
-        // "/pwa9c/sw.js",
 
         "/pwa9c/uajs/uawindow.js",
         "/pwa9c/uajs/uadrag.js",
         "/pwa9c/uajs/ualog.js",
         "/pwa9c/uajs/uajthl.js",
 
-        "/pwa9c/icons/maskable_icon_x144.png",
-        "/pwa9c/icons/maskable_icon_x384.png",
         "/pwa9c/icons/maskable_icon_x512.png",
+        "/pwa9c/icons/maskable_icon_x384.png",
+        "/pwa9c/icons/maskable_icon_x192.png",
+        "/pwa9c/icons/maskable_icon_x144.png",
 
-        "/pwa9c/icons/icon07_x144.png",
-        "/pwa9c/icons/icon07_x384.png",
         "/pwa9c/icons/icon07_x512.png",
+        "/pwa9c/icons/icon07_x384.png",
+        "/pwa9c/icons/icon07_x192.png",
+        "/pwa9c/icons/icon07_x144.png",
 
         "/pwa9c/imgs/fox1.jpg",
         "/pwa9c/imgs/fox2.jpg",
