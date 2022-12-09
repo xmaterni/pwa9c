@@ -142,10 +142,16 @@ self.addEventListener('message', (event) => {
             ualog_status = !ualog_status;
         }
         else if (rqs_cmd == "read_cache") {
+            // readCache().then((urls) => {
+            //     const msg = buildRspMsgToClients(urls, rqs);
+            //     postMessageToClients(msg);
+            // });
             readCache().then((urls) => {
                 const msg = buildRspMsgToClients(urls, rqs);
-                postMessageToClients(msg);
+                event.source.postMessage(msg);
             });
+
+
         }
         else if (rqs_cmd == "read_cache_url") {
             readCacheUrl(rqs_data)
@@ -303,11 +309,19 @@ const buildRspMsgToClients = function (rsp_data, rqs = {}) {
 };
 
 // post message
+// const postMessageToClients = function (message) {
+//     return self.clients.matchAll().then(clients => {
+//         return Promise.all(clients.map(client => {
+//             return client.postMessage(message);
+//         }));
+//     });
+// };
+
 const postMessageToClients = function (message) {
     return self.clients.matchAll().then(clients => {
-        return Promise.all(clients.map(client => {
-            return client.postMessage(message);
-        }));
+        clients.forEach((client) =>{
+            client.postMessage(message);
+        });
     });
 };
 

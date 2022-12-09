@@ -17,7 +17,7 @@ rqs_cmd=push (simulato)
 
     */
 
-const RELEASE = "0.1.6";
+const RELEASE = "0.1.7";
 const SW_NAME = "/pwa9c/sw.js";
 
 const log = function (...args) {
@@ -119,15 +119,14 @@ const receivesMessage = function (event) {
       showReadCacheRsp(msg);
     }
   }
-  else if (rqs_cmd == "read_cache_url") {
-    testFnRspShow(msg);
-  }
+  // else if (rqs_cmd == "read_cache_url") {
+  //   testFnShow(msg);
+  // }
   else {
     const s = `ReceiveMessage Error 
     rqs_cmd:${rqs_cmd} Not Found`;
     alert(s);
   }
-
 };
 
 // const json2str = function (js, ln = '\n') {
@@ -210,30 +209,34 @@ function showReadCacheRsp(msg) {
   // app_log(html);
 }
 
+
 function testFn() {
-  const msg = buildMessageToWorker("read_cache", "testFn");
+
+  const fn = function (event) {
+    const msg = event.data;
+    const rsp_data = msg.rsp_data || {};
+    const s = JSON.stringify(rsp_data);
+    msg_prn(item1, s);
+  };
+
+  navigator.serviceWorker.onmessage = (event) => {
+    fn(event);
+  };
+
+  // const url="http://127.0.0.1:5501/pwa9c/data/anag.json";
+  const url = "/pwa9c/data/anag.json";
+  const msg = {
+    rqs_cmd: "read_cache_url",
+    rsp_cmd: "",
+    rqs_data: url
+  };
   postMessageToWorker(msg);
-  // => testFnRsp(msg_rsp)
 }
 
-function testFnRsp(msg) {
-  const urls = msg.rsp_data || [];
-  let url = "";
-  for (let u of urls) {
-    if (u.indexOf("20") > -1) {
-      url = u;
-      break;
-    }
-  }
-  const msg2 = buildMessageToWorker("read_cache_url", "", url);
-  postMessageToWorker(msg2);
-  //=> testFnRspShow
-}
-
-function testFnRspShow(msg) {
-  const rsp_data = msg.rsp_data || {};
-  const s = JSON.stringify(rsp_data);
-  msg_prn(item1, s);
-}
+// function testFnShow(msg) {
+//   const rsp_data = msg.rsp_data || {};
+//   const s = JSON.stringify(rsp_data);
+//   msg_prn(item1, s);
+// }
 
 
