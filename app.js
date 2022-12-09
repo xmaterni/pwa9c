@@ -59,10 +59,10 @@ if ("serviceWorker" in navigator) {
         SW_STATE = "active";
         log('active');
         //listen to messages
-        // navigator.serviceWorker.onmessage = receivesMessage;
-        navigator.serviceWorker.onmessage = (event) => {
-          receivesMessage(event);
-        };
+        navigator.serviceWorker.onmessage = receivesMessage;
+        // navigator.serviceWorker.onmessage = (event) => {
+        //   receivesMessage(event);
+        // };
       }
       if (sw) {
         sw.addEventListener("statechange", (e) => {
@@ -90,7 +90,6 @@ const receivesMessage = function (event) {
   const rqs_cmd = msg.rqs_cmd || "";
   const rsp_cmd = msg.rsp_cmd || "";
   const rsp_data = msg.rsp_data || "";
-
   if (rqs_cmd == "push") {
     if (rsp_cmd == "log") {
       ualog(rsp_data);

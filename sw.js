@@ -127,12 +127,53 @@ self.addEventListener('activate', (event) => {
     );
 });
 
+// self.addEventListener('message', (event) => {
+//     if (event.data) {
+//         const rqs = event.data || {};
+//         const rqs_cmd = rqs.rqs_cmd || "none";
+//         const rqs_data = rqs.rqs_data || "";
+//         if (rqs_cmd == "test") {
+//             const data = `received from client ${rqs_data}`;
+//             const msg = buildRspMsgToClients(data, rqs);
+//             postMessageToClients(msg);
+//         }
+//         else if (rqs_cmd == "toggle_ualog") {
+//             ualog_status = !ualog_status;
+//         }
+//         else if (rqs_cmd == "read_cache") {
+//             // readCache().then((urls) => {
+//             //     const msg = buildRspMsgToClients(urls, rqs);
+//             //     postMessageToClients(msg);
+//             // });
+//             readCache().then((urls) => {
+//                 const msg = buildRspMsgToClients(urls, rqs);
+//                 event.source.postMessage(msg);
+//             })
+//         }
+//         else if (rqs_cmd == "read_cache_url") {
+//             readCacheUrl(rqs_data)
+//                 .then((rsp) => {
+//                     return rsp.json();
+//                 }).then((js) => {
+//                     const msg = buildRspMsgToClients(js, rqs);
+//                     postMessageToClients(msg);
+
+//                 });
+//         }
+//         else {
+//             const s = `SW Error listener(messag)<br>
+//              rqs_cmd: ${rqs_cmd} Not Found.`;
+//             swlog(s);
+//         }
+//     }
+// });
+
+
 self.addEventListener('message', (event) => {
     if (event.data) {
         const rqs = event.data || {};
         const rqs_cmd = rqs.rqs_cmd || "none";
         const rqs_data = rqs.rqs_data || "";
-
         if (rqs_cmd == "test") {
             const data = `received from client ${rqs_data}`;
             const msg = buildRspMsgToClients(data, rqs);
@@ -142,26 +183,12 @@ self.addEventListener('message', (event) => {
             ualog_status = !ualog_status;
         }
         else if (rqs_cmd == "read_cache") {
-            // readCache().then((urls) => {
-            //     const msg = buildRspMsgToClients(urls, rqs);
-            //     postMessageToClients(msg);
-            // });
-            readCache().then((urls) => {
-                const msg = buildRspMsgToClients(urls, rqs);
-                event.source.postMessage(msg);
-            });
-
-
+            const fn = "readCache";
+            SW_FUNCS[fn](rqs);
         }
         else if (rqs_cmd == "read_cache_url") {
-            readCacheUrl(rqs_data)
-                .then((rsp) => {
-                    return rsp.json();
-                }).then((js) => {
-                    const msg = buildRspMsgToClients(js, rqs);
-                    postMessageToClients(msg);
-
-                });
+            const fn = "readCacheUrl";
+            SW_FUNCS[fn](rqs,rqs_data);
         }
         else {
             const s = `SW Error listener(messag)<br>
@@ -319,7 +346,7 @@ const buildRspMsgToClients = function (rsp_data, rqs = {}) {
 
 const postMessageToClients = function (message) {
     return self.clients.matchAll().then(clients => {
-        clients.forEach((client) =>{
+        clients.forEach((client) => {
             client.postMessage(message);
         });
     });
@@ -329,30 +356,65 @@ const postMessageToClients = function (message) {
 // funzioni varrie
 /////////////////////
 
-const readCache = () => {
-    swlog("readCache");
-    return caches.open(CACHE_NAME).then((cache) => {
-        return cache.keys();
-    }).then((requests) => {
-        const lst = [];
-        for (let rqs of requests)
-            lst.push(rqs.url);
-        return lst;
-    });
-};
+// const readCache = () => {
+//     swlog("readCache");
+//     return caches.open(CACHE_NAME).then((cache) => {
+//         return cache.keys();
+//     }).then((requests) => {
+//         const lst = [];
+//         for (let rqs of requests)
+//             lst.push(rqs.url);
+//         return lst;
+//     });
+// };
 
-const readCacheUrl = (url) => {
-    swlog("readCacheUrl");
-    // const ops = {
-    //     ignoreSearch: true,
-    //     ignoreMethod: true,
-    //     ignoreVary: true
-    // };
-    return caches.open(CACHE_NAME).then((cache) => {
-        console.log(url);
-        return cache.match(url);
-    }).then((response) => {
-        return response;
-    });
-};
+// const readCacheUrl = (url) => {
+//     swlog("readCacheUrl");
+//     // const ops = {
+//     //     ignoreSearch: true,
+//     //     ignoreMethod: true,
+//     //     ignoreVary: true
+//     // };
+//     return caches.open(CACHE_NAME).then((cache) => {
+//         console.log(url);
+//         return cache.match(url);
+//     }).then((response) => {
+//         return response.json();
+//     }).then((json) => {
+//         const msg = buildRspMsgToClients(js, rqs);
+//         postMessageToClients(msg);
+//     });
+// };
 
+
+const SW_FUNCS = {
+    
+    readCache: (rqs) => {
+        swlog("readCache");
+        return caches.open(CACHE_NAME).then((cache) => {
+            return cache.keys();
+        }).then((requests) => {
+            const lst = [];
+            for (let rqs of requests)
+                lst.push(rqs.url);
+            return lst;
+        }).then((urls) => {
+            const msg = buildRspMsgToClients(urls, rqs);
+            // event.source.postMessage(msg);
+            postMessageToClients(msg);
+        });
+    },
+
+    readCacheUrl: (rqs, url) => {
+        swlog("readCacheUrl");
+        return caches.open(CACHE_NAME).then((cache) => {
+            console.log(url);
+            return cache.match(url);
+        }).then((response) => {
+            return response.json();
+        }).then((json) => {
+            const msg = buildRspMsgToClients(json, rqs);
+            postMessageToClients(msg);
+        });
+    }
+};
