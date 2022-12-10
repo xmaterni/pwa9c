@@ -1,3 +1,5 @@
+<!-- @format -->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -33,12 +35,14 @@
     <div class="menu-h">
       <div class="menu-logo">
         <span> Test Menu_HR </span>
+        <span>
+          <a class="aaa1" href="#" onClick="reset();">Reset</a>
+        </span>
       </div>
       <input id="id-menu-btn" name="id-menu-btn" class="menu-btn" type="checkbox" />
       <label for="id-menu-btn" class="menu-icon">
         <span class="nav-icon"></span>
       </label>
-
       <div class="menu-boxes">
         <div class="menu-box">
           <ul>
@@ -75,7 +79,6 @@
         </div>
       </div>
     </div>
-
     <div class="container">
       <div id="item0" class="item item0"></div>
       <div id="item1" class="item item1"></div>
@@ -85,6 +88,7 @@
 </html>
 <script>
   UaLog.setXY(150, 0).setZ(11).new();
+  UaLog.toggle();
 
   (function () {
     const bt = document.querySelector("#id-menu-btn");

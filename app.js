@@ -26,7 +26,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register(SW_NAME)
     .then((registration) => {
-      let sw;
+      let sw = null;
       if (registration.installing) {
         sw = registration.installing;
         SW_STATE = "installing";
@@ -42,30 +42,33 @@ if ("serviceWorker" in navigator) {
         log('active');
         //listen to messages
         navigator.serviceWorker.onmessage = receivesMessage;
-        // navigator.serviceWorker.onmessage = (event) => {
-        //   receivesMessage(event);
-        // };
+        navigator.serviceWorker.onerror = receivesError;
       }
       if (sw) {
         sw.addEventListener("statechange", (e) => {
           log(`statechange ${e.target.state}`);
         });
       }
-      const msg = `SW ${SW_NAME}
-      &nbsp;&nbsp;&nbsp;&nbsp;(${RELEASE})&nbsp;&nbsp;&nbsp;&nbsp;
-      ${SW_STATE.toUpperCase()}`;
+      const msg = ` <span>SW ${SW_NAME}</span>
+      <span>(${RELEASE})</span>
+      <span>${SW_STATE.toUpperCase()}</span>`;
       app_info(msg);
     })
     .catch((error) => {
       alert(`Error(0) app.js\n${SW_NAME}\n ${error}`);
     });
 } else {
-  alert(`Erroro(1) app-js \n${SW_NAME} not in navigator`);
+  alert(`Erroro(1) app.js \n${SW_NAME} not in navigator`);
 }
 
 ///////////////////
 //gestione messaggi
 ////////////////////
+
+const receivesError = function (event) {
+  console.log(event);
+  alert(event);
+};
 
 const receivesMessage = function (event) {
   if (!event.data) {
@@ -75,40 +78,41 @@ const receivesMessage = function (event) {
   try {
     const sw_msg = event.data;
     const cli_fn = sw_msg.cli_fn;
-    SW_FUNCS[cli_fn](sw_msg);
+    ReceiveMsgRsp[cli_fn](sw_msg);
   }
-  catch (e) {
-    const s = `ERROR receiveMessage(event)
-      event_data:${event_data}`;
-    alert(s);
+  catch (err) {
+    alert(err);
   }
-
 };
 
-const CLI_FUNCS = {
-  default_response: (sw_msg) => {
-    s = `default_response\n
-    sw_msg:${sw_msg}`;
+const ReceiveMsgRsp = {
+  default: function (sw_msg) {
+    s = `default\n sw_msg:${sw_msg}`;
     alert(s);
   },
-  swlog: (sw_msg) => {
+  ualog: function (sw_msg) {
     ualog(sw_msg.cli_fn_arg);
   },
-  testMsgLog_response: (sw_msg) => {
-    testMsgLog_response(sw_msg);
+  testMsgLog: function (sw_msg) {
+    const data = sw_msg.cli_fn_arg;
+    ualog(data);
   },
-  testMsgPrn_response: (sw_msg) => {
-    testMsgPrn_response(sw_msg);
+  testMsgPrn: function (sw_msg) {
+    const data = sw_msg.cli_fn_arg;
+    app_log(data);
   },
-  readCache_response: (sw_msg) => {
-    readCache_response(sw_msg);
+  readCacheSW: function (sw_msg) {
+    const data = sw_msg.cli_fn_arg || [];
+    showList(data);
   },
-  readCacheUrlRsp: (sw_msg) => {
-    readCacheUrlRsp(sw_msg);
+  readCacheUrl: function (sw_msg) {
+    const data = sw_msg.cli_fn_arg || {};
+    const s = JSON.stringify(data);
+    msg_prn(item1, s);
   }
 };
 
-const postMessageToWorker = function (msg) {
+const postMessageToSW = function (msg) {
   if (navigator.serviceWorker.controller) {
     navigator.serviceWorker.controller.postMessage(msg);
   } else {
@@ -116,53 +120,37 @@ const postMessageToWorker = function (msg) {
   }
 };
 
-const buildMessageCli = function (sw_fn, sw_fn_arg = null, cli_fn = null) {
+const buildMessageCli = function (sw_fn, sw_fn_arg = null) {
   return {
     sw_fn: sw_fn,
-    sw_fn_arg: sw_fn_arg,
-    cli_fn: cli_fn
+    sw_fn_arg: sw_fn_arg
   };
 };
 
 const testMsgLog = function () {
   const fn_name = arguments.callee.name;
   const msg = buildMessageCli(fn_name, "Test Log");
-  postMessageToWorker(msg);
+  postMessageToSW(msg);
 };
 
-const testMsgLog_response = function (sw_msg) {
-  const data = sw_msg - cli_fn_arg;
-  ualog(data);
-};
-
-
-const testMgPrn = function () {
+const testMsgPrn = function () {
   const fn_name = arguments.callee.name;
   const msg = buildMessageCli(fn_name, "Test Prn");
-  postMessageToWorker(msg);
-};
-
-const testMsgPrn_response = function (sw_msg) {
-  const data = sw_msg - cli_fn_arg;
-  app_log(data);
+  postMessageToSW(msg);
 };
 
 const toggleUaLog = function () {
   const fn_name = arguments.callee.name;
   const msg = buildMessageCli(fn_name);
-  postMessageToWorker(msg);
+  postMessageToSW(msg);
 };
 
 const readCacheSW = function () {
   const fn_name = arguments.callee.name;
-  const msg = buildMessageCli(fn_name, null, "showReadCacheRsp");
-  postMessageToWorker(msg);
+  const msg = buildMessageCli(fn_name);
+  postMessageToSW(msg);
 };
 
-const readCacheSW_response = function (sw_msg) {
-  const data = sw_msg.cli_fn_arg || [];
-  showList(data);
-};
 
 // const testFn = function () {
 //   navigator.serviceWorker.onmessage = (event) => {
@@ -182,15 +170,10 @@ const readCacheSW_response = function (sw_msg) {
 const testFn = function () {
   // const url="http://127.0.0.1:5501/pwa9c/data/anag.json";
   const url = "/pwa9c/data/anag.json";
-  const cli_msg = buildMessageCli("readCacheUrl", url,"readCaceUrlRsp");
-  postMessageToWorker(cli_msg);
+  const cli_msg = buildMessageCli("readCacheUrl", url);
+  postMessageToSW(cli_msg);
 };
 
-const readCacheUrlRsp= function (sw_msg) {
-  const data = sw_msg.cli_fn_arg || {};
-  const s = JSON.stringify(data);
-  msg_prn(item1, s);
-};
 
 ////////////////////////////////////////
 

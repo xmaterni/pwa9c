@@ -88,7 +88,7 @@ button {
 // 769px — 1024px: Small screens, laptops.
 // 1025px — 1200px: Desktops, large screens.
 // 1201px and more — Extra large screens, TV
-@xcolor:#f3ff08;
+@xcolor: #f3ff08;
 .brd0 {
   border: 1px solid red;
 }
@@ -136,6 +136,13 @@ body {
 @fsize-container: clamp(0.8rem, 1.5vw, 1.5rem);
 // @fsize-container: calc(10px + 1vw);
 
+span.info {
+  font-size: @fsize-container;
+  color: @frg-conatainer;
+  padding: 0;
+  margin-right: 30px !important;
+}
+
 div.container {
   // .brd2;
   box-sizing: border-box;
@@ -152,7 +159,6 @@ div.container {
 
   div.item {
     box-sizing: border-box;
-    min-height: 50px;
     margin: 0;
     padding: 0;
     font-size: @fsize-container;
@@ -163,13 +169,14 @@ div.container {
   div.item0 {
     background-color: @bck-item0;
     flex: 1;
-    padding-top: 10px;
+    padding-top: 2px;
     text-align: center;
+    max-height: 30px;
   }
 
   div.item1 {
     background-color: @bck-item1;
-    flex: 10;
+    flex: 20;
   }
 }
 

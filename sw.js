@@ -3,11 +3,8 @@
 
 const swlog = function (txt) {
     console.log(txt);
-    if (ualog_status) {
-        // const msg = buildPushMsgToClients(txt, "log");
-        const sw_msg = buildMessagesSW(null, txt, "swlog");
-        postMessageToClients(sw_msg);
-    }
+    if (ualog_active)
+        SenderMsgPush.ualog(txt);
 };
 
 const logRequest = function (request) {
@@ -34,7 +31,7 @@ const logRequest = function (request) {
 ////////////////////
 
 const CACHE_NAME = "pwa9c_1";
-let ualog_status = true;
+let ualog_active = false;
 
 const config = {
     version: "sw_3",
@@ -142,7 +139,7 @@ self.addEventListener('fetch', (event) => {
         return staleWhileRevalidate(event);
     }
     else {
-        swlog("fetch null");
+        console.err("fetch nell");
         return;
     }
 });
@@ -220,151 +217,111 @@ const staleWhileRevalidate = (event) => {
 /////////////////////////
 // gestione messaggi
 ///////////////////////
-// self.addEventListener('message', (event) => {
-//     if (event.data) {
-//         const rqs = event.data || {};
-//         const rqs_cmd = rqs.rqs_cmd || "none";
-//         const rqs_data = rqs.rqs_data || "";
-//         if (rqs_cmd == "test") {
-//             const data = `received from client ${rqs_data}`;
-//             const msg = buildRspMsgToClients(data, rqs);
-//             postMessageToClients(msg);
-//         }
-//         else if (rqs_cmd == "toggle_ualog") {
-//             ualog_status = !ualog_status;
-//         }
-//         else if (rqs_cmd == "read_cache") {
-//             const fn = "readCache";
-//             SW_FUNCS[fn](rqs);
-//         }
-//         else if (rqs_cmd == "read_cache_url") {
-//             const fn = "readCacheUrl";
-//             SW_FUNCS[fn](rqs,rqs_data);
-//         }
-//         else {
-//             const s = `SW Error listener(messag)<br>
-//              rqs_cmd: ${rqs_cmd} Not Found.`;
-//             swlog(s);
-//         }
-//     }
-// });
 
 
 self.addEventListener('message', (event) => {
-    if (event.data) {
-        try {
-            const cli_msg = event.data | {};
-            const sw_fn = cli_msg.sw_fn;
-            SW_FUNCS[sw_fn](cli_msg);
-        }
-        catch (e) {
-            const s = ` 
-            SW ERROR addEventListener(messag)\n
-            ${err}\n
-            event.data: ${event.data} `;
-            swlog(s);
-        }
+    try {
+        const cli_msg = event.data;
+        const sw_fn = cli_msg.sw_fn;
+        SenderMsgRsp[sw_fn](cli_msg,event);
+    }
+    catch (err) {
+        console.err(err);
     }
 });
 
 
-const SW_FUNCS = {
-    testMsgLog: (cli_msg) => {
-        testMsgLog(cli_msg);
+const SenderMsgRsp = {
+    buildMessage: function (cli_msg, cli_fn_arg = null, cli_fn = null) {
+        let fn = cli_msg.sw_fn;
+        if (!!cli_fn)
+            fn = cli_fn;
+        return {
+            cli_fn: fn,
+            cli_fn_arg: cli_fn_arg
+        };
     },
-    testMsgPrn: (cli_msg) => {
-        testMsgPrn(cli_msg);
+    postMessage: function (message) {
+        return self.clients.matchAll().then(clients => {
+            clients.forEach((client) => {
+                client.postMessage(message);
+            });
+        });
     },
-    toggleUaLog: (cli_msg) => {
-        toggleUaLog(cli_msg);
+    testMsgLog: function (cli_msg) {
+        const cli_data = cli_msg.sw_fn_arg;
+        const data = `received from client ${cli_data}`;
+        const sw_msg = this.buildMessage(cli_msg, data);
+        this.postMessage(sw_msg);
     },
-    readCache: (cli_msg) => {
-        readCache(cli_msg);
+    testMsgPrn: function (cli_msg) {
+        const cli_data = cli_msg.sw_fn_arg;
+        const data = `received from client ${cli_data}`;
+        const sw_msg = this.buildMessage(cli_msg, data);
+        this.postMessage(sw_msg);
     },
-    readCacheUrl: (cli_msg) => {
-        readCacheUrl(cli_msg);
+    toggleUaLog: function (cli_msg) {
+        ualog_active = !ualog_active;
+    },
+    readCacheSW: function (cli_msg) {
+        swlog("readCache");
+        return caches.open(CACHE_NAME).then((cache) => {
+            return cache.keys();
+        }).then((requests) => {
+            const lst = [];
+            for (let rqs of requests)
+                lst.push(rqs.url);
+            return lst;
+        }).then((urls) => {
+            const sw_msg = this.buildMessage(cli_msg, urls);
+            // event.source.postMessage(msg);
+            this.postMessage(sw_msg);
+        });
+    },
+    readCacheUrl: function (cli_msg) {
+        swlog("readCacheUrl");
+        const url = cli_msg.sw_fn_arg;
+        return caches.open(CACHE_NAME).then((cache) => {
+            // const ops = {
+            //     ignoreSearch: true,
+            //     ignoreMethod: true,
+            //     ignoreVary: true
+            // };
+            return cache.match(url);
+        }).then((response) => {
+            return response.json();
+        }).then((json) => {
+            const msg = this.buildMessage(cli_msg, json);
+            // event.source.postMessage(msg);
+            this.postMessage(msg);
+        });
     }
 };
 
-// const postMessageToClients = function (message) {
-//     return self.clients.matchAll().then(clients => {
-//         return Promise.all(clients.map(client => {
-//             return client.postMessage(message);
-//         }));
-//     });
-// };
-const postMessageToClients = function (message) {
-    return self.clients.matchAll().then(clients => {
-        clients.forEach((client) => {
-            client.postMessage(message);
+
+const SenderMsgPush = {
+    buildMessage: (cli_fn, cli_fn_arg = null) => {
+        return {
+            cli_fn: cli_fn,
+            cli_fn_arg: cli_fn_arg
+        };
+    },
+    postMessage: (message) => {
+        return self.clients.matchAll().then(clients => {
+            clients.forEach((client) => {
+                client.postMessage(message);
+            });
         });
-    });
+    },
+    ualog: function (text) {
+        const sw_msg = this.buildMessage("ualog", text);
+        this.postMessage(sw_msg);
+    }
 };
 
-const buildMessagesSW = function (msg_cli, cli_fn = null, cli_fn_arg = null) {
-    let fn = "deafult_response";
-    if (!!msg_cli.cli_fn)
-        fn = msg_cli.cli_fn + "_rresponse";
-    if (!!cli_fn)
-        fn = cli_fn;
-    return {
-        cli_fn: fn,
-        cli_fn_arg: cli_fn_arg
-    };
-};
 
-const testMsgLog = function (cli_msg) {
-    const cli_data = cli_msg.sw_fn_arg;
-    const data = `received from client ${cli_data}`;
-    const sw_msg = buildMessagesSW(cli_msg, null, data);
-    postMessageToClients(sw_msg);
-};
 
-const testMsgPrn = function (cli_msg) {
-    const cli_data = cli_msg.sw_fn_arg;
-    const data = `received from client ${cli_data}`;
-    const sw_msg = buildMessagesSW(cli_msg, null, data);
-    postMessageToClients(sw_msg);
-};
 
-const toggleUaLog = function (msg_cli) {
-    ualog_status = !ualog_status;
-};
 
-const readCache = (cli_msg) => {
-    swlog("readCache");
-    return caches.open(CACHE_NAME).then((cache) => {
-        return cache.keys();
-    }).then((requests) => {
-        const lst = [];
-        for (let rqs of requests)
-            lst.push(rqs.url);
-        return lst;
-    }).then((urls) => {
-        const sw_msg = buildMessagesSW(cli_msg, null, urls);
-        // event.source.postMessage(msg);
-        postMessageToClients(sw_msg);
-    });
-};
 
-// const ops = {
-//     ignoreSearch: true,
-//     ignoreMethod: true,
-//     ignoreVary: true
-// };
-
-const readCacheUrl = (cli_msg,) => {
-    swlog("readCacheUrl");
-    const url = cli_msg.sw_fn_arg;
-    return caches.open(CACHE_NAME).then((cache) => {
-        console.log(url);
-        return cache.match(url);
-    }).then((response) => {
-        return response.json();
-    }).then((json) => {
-        const msg = buildMessagesSW(cli_msg, null, json);
-        // event.source.postMessage(msg);
-        postMessageToClients(msg);
-    });
-};
 
