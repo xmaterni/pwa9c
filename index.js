@@ -88,14 +88,11 @@ const fn2 = function () {
 };
 
 const fn3 = function () {
-    const msg = buildMessageToWorker("test", "prn", "Test Prn");
-    postMessageToWorker(msg);
+    testMsgPrn();
 };
 
-
 const fn4 = function () {
-    const msg = buildMessageToWorker("test", "log", "Test Log");
-    postMessageToWorker(msg);
+    testMsgLog();
 };
 
 const fn5 = function (name) {

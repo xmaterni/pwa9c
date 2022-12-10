@@ -1,22 +1,5 @@
 /*jshint esversion:8 */
 
-////////////////////
-//dialogo app-sw
-////////////////////
-/*
-REQUEST => buildRspMsgToClients
-rqs_cmd:test
-  rsp_cmd:log
-  rsp_cmd:prn
-rqs_cmd:toggle_ualog
-rqs_cmd:read_cache
- 
-PUSH  => buildPushMsgToClients 
-rqs_cmd=push (simulato)
-    rsp_cmd=log (SW)
-
-    */
-
 const RELEASE = "0.1.7";
 const SW_NAME = "/pwa9c/sw.js";
 
@@ -35,7 +18,6 @@ const app_info = function (txt) {
 const app_log = function (txt) {
   msg_prn(item1, txt);
 };
-
 
 
 let SW_STATE = "unregistred";
@@ -86,65 +68,46 @@ if ("serviceWorker" in navigator) {
 ////////////////////
 
 const receivesMessage = function (event) {
-  const msg = event.data;
-  const rqs_cmd = msg.rqs_cmd || "";
-  const rsp_cmd = msg.rsp_cmd || "";
-  const rsp_data = msg.rsp_data || "";
-  if (rqs_cmd == "push") {
-    if (rsp_cmd == "log") {
-      ualog(rsp_data);
-    }
-    else {
-      const s = `ReceiveMessage Error 
-      rqs_cmd:push
-      rsp_cmd:${rsp_cmd} Not Found`;
-      alert(s);
-    }
+  if (!event.data) {
+    alert("event.data null");
+    return;
   }
-  // 
-  else if (rqs_cmd == "test") {
-    if (rsp_cmd == "log") {
-      ualog(rsp_data);
-    }
-    else if (rsp_cmd == "prn") {
-      app_log(rsp_data);
-    }
+  try {
+    const sw_msg = event.data;
+    const cli_fn = sw_msg.cli_fn;
+    SW_FUNCS[cli_fn](sw_msg);
   }
-  else if (rqs_cmd == "read_cache") {
-    if (rsp_cmd == "testFn") {
-      testFnRsp(msg);
-    }
-    else {
-      showReadCacheRsp(msg);
-    }
-  }
-  // else if (rqs_cmd == "read_cache_url") {
-  //   testFnShow(msg);
-  // }
-  else {
-    const s = `ReceiveMessage Error 
-    rqs_cmd:${rqs_cmd} Not Found`;
+  catch (e) {
+    const s = `ERROR receiveMessage(event)
+      event_data:${event_data}`;
     alert(s);
   }
+
 };
 
-// const json2str = function (js, ln = '\n') {
-//   const es = Object.entries(js);
-//   const lst = es.map((kv) => `${kv[0]}:${kv[1]}`);
-//   return lst.join(ln);
-// };
-
-
-const buildMessageToWorker = function (rqs_cmd, rsp_cmd = "", data = "") {
-  const msg = {
-    rqs_cmd: rqs_cmd,
-    rsp_cmd: rsp_cmd,
-    rqs_data: data
-  };
-  return msg;
+const CLI_FUNCS = {
+  default_response: (sw_msg) => {
+    s = `default_response\n
+    sw_msg:${sw_msg}`;
+    alert(s);
+  },
+  swlog: (sw_msg) => {
+    ualog(sw_msg.cli_fn_arg);
+  },
+  testMsgLog_response: (sw_msg) => {
+    testMsgLog_response(sw_msg);
+  },
+  testMsgPrn_response: (sw_msg) => {
+    testMsgPrn_response(sw_msg);
+  },
+  readCache_response: (sw_msg) => {
+    readCache_response(sw_msg);
+  },
+  readCacheUrlRsp: (sw_msg) => {
+    readCacheUrlRsp(sw_msg);
+  }
 };
 
-//post message to worker
 const postMessageToWorker = function (msg) {
   if (navigator.serviceWorker.controller) {
     navigator.serviceWorker.controller.postMessage(msg);
@@ -153,9 +116,83 @@ const postMessageToWorker = function (msg) {
   }
 };
 
-//////////////////
-// funzioni varie
-//////////////////
+const buildMessageCli = function (sw_fn, sw_fn_arg = null, cli_fn = null) {
+  return {
+    sw_fn: sw_fn,
+    sw_fn_arg: sw_fn_arg,
+    cli_fn: cli_fn
+  };
+};
+
+const testMsgLog = function () {
+  const fn_name = arguments.callee.name;
+  const msg = buildMessageCli(fn_name, "Test Log");
+  postMessageToWorker(msg);
+};
+
+const testMsgLog_response = function (sw_msg) {
+  const data = sw_msg - cli_fn_arg;
+  ualog(data);
+};
+
+
+const testMgPrn = function () {
+  const fn_name = arguments.callee.name;
+  const msg = buildMessageCli(fn_name, "Test Prn");
+  postMessageToWorker(msg);
+};
+
+const testMsgPrn_response = function (sw_msg) {
+  const data = sw_msg - cli_fn_arg;
+  app_log(data);
+};
+
+const toggleUaLog = function () {
+  const fn_name = arguments.callee.name;
+  const msg = buildMessageCli(fn_name);
+  postMessageToWorker(msg);
+};
+
+const readCacheSW = function () {
+  const fn_name = arguments.callee.name;
+  const msg = buildMessageCli(fn_name, null, "showReadCacheRsp");
+  postMessageToWorker(msg);
+};
+
+const readCacheSW_response = function (sw_msg) {
+  const data = sw_msg.cli_fn_arg || [];
+  showList(data);
+};
+
+// const testFn = function () {
+//   navigator.serviceWorker.onmessage = (event) => {
+//     const sw_msg = event.data;
+//     const data = sw_msg.cli_fn_arg || {};
+//     const s = JSON.stringify(data);
+//     msg_prn(item1, s);
+//   };
+//   // const url="http://127.0.0.1:5501/pwa9c/data/anag.json";
+//   const url = "/pwa9c/data/anag.json";
+//   // const fn_name = arguments.callee.name;
+//   const msg = buildMessageCli(null, url,"readCacheUrl");
+//   postMessageToWorker(msg);
+// };
+
+
+const testFn = function () {
+  // const url="http://127.0.0.1:5501/pwa9c/data/anag.json";
+  const url = "/pwa9c/data/anag.json";
+  const cli_msg = buildMessageCli("readCacheUrl", url,"readCaceUrlRsp");
+  postMessageToWorker(cli_msg);
+};
+
+const readCacheUrlRsp= function (sw_msg) {
+  const data = sw_msg.cli_fn_arg || {};
+  const s = JSON.stringify(data);
+  msg_prn(item1, s);
+};
+
+////////////////////////////////////////
 
 function unregist() {
   if ('serviceWorker' in navigator) {
@@ -164,7 +201,6 @@ function unregist() {
     });
   }
 }
-
 function unregistAll() {
   navigator.serviceWorker.getRegistrations().then((registrations) => {
     for (let registration of registrations) {
@@ -189,53 +225,5 @@ function reset() {
 function reload() {
   window.location.reload();
 }
-
-function toggleUaLog() {
-  const msg = buildMessageToWorker("toggle_ualog");
-  postMessageToWorker(msg);
-}
-
-function readCacheSW() {
-  const msg = buildMessageToWorker("read_cache",);
-  postMessageToWorker(msg);
-  // => showReadCacheResp(msg_rsp)
-}
-
-function showReadCacheRsp(msg) {
-  const rsp_data = msg.rsp_data || [];
-  showList(rsp_data);
-  // const html = json2str(rsp_data, "<br>");
-  // app_log(html);
-}
-
-
-function testFn() {
-
-  const fn = function (event) {
-    const msg = event.data;
-    const rsp_data = msg.rsp_data || {};
-    const s = JSON.stringify(rsp_data);
-    msg_prn(item1, s);
-  };
-
-  navigator.serviceWorker.onmessage = (event) => {
-    fn(event);
-  };
-
-  // const url="http://127.0.0.1:5501/pwa9c/data/anag.json";
-  const url = "/pwa9c/data/anag.json";
-  const msg = {
-    rqs_cmd: "read_cache_url",
-    rsp_cmd: "",
-    rqs_data: url
-  };
-  postMessageToWorker(msg);
-}
-
-// function testFnShow(msg) {
-//   const rsp_data = msg.rsp_data || {};
-//   const s = JSON.stringify(rsp_data);
-//   msg_prn(item1, s);
-// }
 
 

@@ -1,16 +1,12 @@
 /*jshint esversion:8 */
 // "use strict";
 
-
-////////////////
-// log
-///////////////
-
 const swlog = function (txt) {
     console.log(txt);
     if (ualog_status) {
-        const msg = buildPushMsgToClients(txt, "log");
-        postMessageToClients(msg);
+        // const msg = buildPushMsgToClients(txt, "log");
+        const sw_msg = buildMessagesSW(null, txt, "swlog");
+        postMessageToClients(sw_msg);
     }
 };
 
@@ -36,19 +32,6 @@ const logRequest = function (request) {
 ////////////////////
 //dialogo app-sw
 ////////////////////
-/*
-REQUEST => buildRspMsgToClients
-rqs_cmd=test
-    rdp_cmd=log (app)
-    rsp_cmd=prn (app)
-rqs_cmd=toggle_ualog
-rqs_cmd=read_cache
-
-PUSH  => buildPushMsgToClients 
-rqs_cmd=push (simulato)
-    rsp_cmd=log (SW)
-
-*/
 
 const CACHE_NAME = "pwa9c_1";
 let ualog_status = true;
@@ -99,8 +82,6 @@ const config = {
     ]
 };
 
-// listener
-
 self.addEventListener('install', (event) => {
     swlog("install " + config.version);
     event.waitUntil(caches.open(CACHE_NAME)
@@ -126,48 +107,6 @@ self.addEventListener('activate', (event) => {
         })
     );
 });
-
-// self.addEventListener('message', (event) => {
-//     if (event.data) {
-//         const rqs = event.data || {};
-//         const rqs_cmd = rqs.rqs_cmd || "none";
-//         const rqs_data = rqs.rqs_data || "";
-//         if (rqs_cmd == "test") {
-//             const data = `received from client ${rqs_data}`;
-//             const msg = buildRspMsgToClients(data, rqs);
-//             postMessageToClients(msg);
-//         }
-//         else if (rqs_cmd == "toggle_ualog") {
-//             ualog_status = !ualog_status;
-//         }
-//         else if (rqs_cmd == "read_cache") {
-//             // readCache().then((urls) => {
-//             //     const msg = buildRspMsgToClients(urls, rqs);
-//             //     postMessageToClients(msg);
-//             // });
-//             readCache().then((urls) => {
-//                 const msg = buildRspMsgToClients(urls, rqs);
-//                 event.source.postMessage(msg);
-//             })
-//         }
-//         else if (rqs_cmd == "read_cache_url") {
-//             readCacheUrl(rqs_data)
-//                 .then((rsp) => {
-//                     return rsp.json();
-//                 }).then((js) => {
-//                     const msg = buildRspMsgToClients(js, rqs);
-//                     postMessageToClients(msg);
-
-//                 });
-//         }
-//         else {
-//             const s = `SW Error listener(messag)<br>
-//              rqs_cmd: ${rqs_cmd} Not Found.`;
-//             swlog(s);
-//         }
-//     }
-// });
-
 
 ///////////////////////
 // fetch
@@ -208,9 +147,6 @@ self.addEventListener('fetch', (event) => {
     }
 });
 
-//////////////////
-//fetch strtegy
-////////////////
 const networkOnly = (event) => {
     event.respondWith(fetch(event.request));
 };
@@ -283,60 +219,73 @@ const staleWhileRevalidate = (event) => {
 
 /////////////////////////
 // gestione messaggi
+///////////////////////
+// self.addEventListener('message', (event) => {
+//     if (event.data) {
+//         const rqs = event.data || {};
+//         const rqs_cmd = rqs.rqs_cmd || "none";
+//         const rqs_data = rqs.rqs_data || "";
+//         if (rqs_cmd == "test") {
+//             const data = `received from client ${rqs_data}`;
+//             const msg = buildRspMsgToClients(data, rqs);
+//             postMessageToClients(msg);
+//         }
+//         else if (rqs_cmd == "toggle_ualog") {
+//             ualog_status = !ualog_status;
+//         }
+//         else if (rqs_cmd == "read_cache") {
+//             const fn = "readCache";
+//             SW_FUNCS[fn](rqs);
+//         }
+//         else if (rqs_cmd == "read_cache_url") {
+//             const fn = "readCacheUrl";
+//             SW_FUNCS[fn](rqs,rqs_data);
+//         }
+//         else {
+//             const s = `SW Error listener(messag)<br>
+//              rqs_cmd: ${rqs_cmd} Not Found.`;
+//             swlog(s);
+//         }
+//     }
+// });
+
 
 self.addEventListener('message', (event) => {
     if (event.data) {
-        const rqs = event.data || {};
-        const rqs_cmd = rqs.rqs_cmd || "none";
-        const rqs_data = rqs.rqs_data || "";
-        if (rqs_cmd == "test") {
-            const data = `received from client ${rqs_data}`;
-            const msg = buildRspMsgToClients(data, rqs);
-            postMessageToClients(msg);
+        try {
+            const cli_msg = event.data | {};
+            const sw_fn = cli_msg.sw_fn;
+            SW_FUNCS[sw_fn](cli_msg);
         }
-        else if (rqs_cmd == "toggle_ualog") {
-            ualog_status = !ualog_status;
-        }
-        else if (rqs_cmd == "read_cache") {
-            const fn = "readCache";
-            SW_FUNCS[fn](rqs);
-        }
-        else if (rqs_cmd == "read_cache_url") {
-            const fn = "readCacheUrl";
-            SW_FUNCS[fn](rqs, rqs_data);
-        }
-        else {
-            const s = `SW Error listener(messag)<br>
-             rqs_cmd: ${rqs_cmd} Not Found.`;
+        catch (e) {
+            const s = ` 
+            SW ERROR addEventListener(messag)\n
+            ${err}\n
+            event.data: ${event.data} `;
             swlog(s);
         }
     }
 });
 
 
-//messaggio inviato al client dal SW
-const buildPushMsgToClients = function (rsp_data, rsp_cmd = "") {
-    const msg = {
-        rqs_cmd: "push",
-        rsp_cmd: rsp_cmd,
-        rsp_data: rsp_data
-    };
-    return msg;
+const SW_FUNCS = {
+    testMsgLog: (cli_msg) => {
+        testMsgLog(cli_msg);
+    },
+    testMsgPrn: (cli_msg) => {
+        testMsgPrn(cli_msg);
+    },
+    toggleUaLog: (cli_msg) => {
+        toggleUaLog(cli_msg);
+    },
+    readCache: (cli_msg) => {
+        readCache(cli_msg);
+    },
+    readCacheUrl: (cli_msg) => {
+        readCacheUrl(cli_msg);
+    }
 };
 
-//messaggio di risposta ad una request
-const buildRspMsgToClients = function (rsp_data, rqs = {}) {
-    const rqs_cmd = rqs.rqs_cmd || "none";
-    const rsp_cmd = rqs.rsp_cmd || "none";
-    const msg = {
-        rqs_cmd: rqs_cmd,
-        rsp_cmd: rsp_cmd,
-        rsp_data: rsp_data
-    };
-    return msg;
-};
-
-// post message
 // const postMessageToClients = function (message) {
 //     return self.clients.matchAll().then(clients => {
 //         return Promise.all(clients.map(client => {
@@ -344,7 +293,6 @@ const buildRspMsgToClients = function (rsp_data, rqs = {}) {
 //         }));
 //     });
 // };
-
 const postMessageToClients = function (message) {
     return self.clients.matchAll().then(clients => {
         clients.forEach((client) => {
@@ -353,17 +301,37 @@ const postMessageToClients = function (message) {
     });
 };
 
-const SW_FUNCS = {
-    readCache: (rqs) => {
-        readCache(rqs);
-    },
-    readCacheUrl: (rqs, url) => {
-        readCacheUrl(rqs, url);
-    }
+const buildMessagesSW = function (msg_cli, cli_fn = null, cli_fn_arg = null) {
+    let fn = "deafult_response";
+    if (!!msg_cli.cli_fn)
+        fn = msg_cli.cli_fn + "_rresponse";
+    if (!!cli_fn)
+        fn = cli_fn;
+    return {
+        cli_fn: fn,
+        cli_fn_arg: cli_fn_arg
+    };
 };
 
+const testMsgLog = function (cli_msg) {
+    const cli_data = cli_msg.sw_fn_arg;
+    const data = `received from client ${cli_data}`;
+    const sw_msg = buildMessagesSW(cli_msg, null, data);
+    postMessageToClients(sw_msg);
+};
 
-const readCache = (rqs) => {
+const testMsgPrn = function (cli_msg) {
+    const cli_data = cli_msg.sw_fn_arg;
+    const data = `received from client ${cli_data}`;
+    const sw_msg = buildMessagesSW(cli_msg, null, data);
+    postMessageToClients(sw_msg);
+};
+
+const toggleUaLog = function (msg_cli) {
+    ualog_status = !ualog_status;
+};
+
+const readCache = (cli_msg) => {
     swlog("readCache");
     return caches.open(CACHE_NAME).then((cache) => {
         return cache.keys();
@@ -373,9 +341,9 @@ const readCache = (rqs) => {
             lst.push(rqs.url);
         return lst;
     }).then((urls) => {
-        const msg = buildRspMsgToClients(urls, rqs);
+        const sw_msg = buildMessagesSW(cli_msg, null, urls);
         // event.source.postMessage(msg);
-        postMessageToClients(msg);
+        postMessageToClients(sw_msg);
     });
 };
 
@@ -385,15 +353,17 @@ const readCache = (rqs) => {
 //     ignoreVary: true
 // };
 
-const readCacheUrl = (rqs, url) => {
+const readCacheUrl = (cli_msg,) => {
     swlog("readCacheUrl");
+    const url = cli_msg.sw_fn_arg;
     return caches.open(CACHE_NAME).then((cache) => {
         console.log(url);
         return cache.match(url);
     }).then((response) => {
         return response.json();
     }).then((json) => {
-        const msg = buildRspMsgToClients(json, rqs);
+        const msg = buildMessagesSW(cli_msg, null, json);
+        // event.source.postMessage(msg);
         postMessageToClients(msg);
     });
 };
