@@ -214,7 +214,7 @@ const staleWhileRevalidate = (event) => {
         }));
 };
 
-/////////////////////////
+//////////////////////
 // gestione messaggi
 ///////////////////////
 
@@ -223,7 +223,7 @@ self.addEventListener('message', (event) => {
     try {
         const cli_msg = event.data;
         const sw_fn = cli_msg.sw_fn;
-        SenderMsgRsp[sw_fn](cli_msg,event);
+        SenderMsgRsp[sw_fn](cli_msg, event);
     }
     catch (err) {
         console.err(err);
@@ -251,19 +251,20 @@ const SenderMsgRsp = {
     testMsgLog: function (cli_msg) {
         const cli_data = cli_msg.sw_fn_arg;
         const data = `received from client ${cli_data}`;
-        const sw_msg = this.buildMessage(cli_msg, data);
-        this.postMessage(sw_msg);
+        const msg = this.buildMessage(cli_msg, data);
+        this.postMessage(msg);
     },
-    testMsgPrn: function (cli_msg) {
+    testMsgPrn: function (cli_msg,event) {
         const cli_data = cli_msg.sw_fn_arg;
         const data = `received from client ${cli_data}`;
-        const sw_msg = this.buildMessage(cli_msg, data);
-        this.postMessage(sw_msg);
+        const msg = this.buildMessage(cli_msg, data);
+        // this.postMessage(sw_msg);
+        event.source.postMessage(msg);
     },
     toggleUaLog: function (cli_msg) {
         ualog_active = !ualog_active;
     },
-    readCacheSW: function (cli_msg) {
+    readCacheSW: function (cli_msg, event) {
         swlog("readCache");
         return caches.open(CACHE_NAME).then((cache) => {
             return cache.keys();
@@ -273,12 +274,12 @@ const SenderMsgRsp = {
                 lst.push(rqs.url);
             return lst;
         }).then((urls) => {
-            const sw_msg = this.buildMessage(cli_msg, urls);
-            // event.source.postMessage(msg);
-            this.postMessage(sw_msg);
+            const msg = this.buildMessage(cli_msg, urls);
+            event.source.postMessage(msg);
+            // this.postMessage(sw_msg);
         });
     },
-    readCacheUrl: function (cli_msg) {
+    readCacheUrl: function (cli_msg,event) {
         swlog("readCacheUrl");
         const url = cli_msg.sw_fn_arg;
         return caches.open(CACHE_NAME).then((cache) => {
@@ -292,8 +293,8 @@ const SenderMsgRsp = {
             return response.json();
         }).then((json) => {
             const msg = this.buildMessage(cli_msg, json);
-            // event.source.postMessage(msg);
-            this.postMessage(msg);
+            event.source.postMessage(msg);
+            // this.postMessage(msg);
         });
     }
 };
