@@ -323,12 +323,14 @@ const SenderMsgRsp = {
     },
     //AAA
     putCache: function (cli_msg) {
-        const url = "/pwa9c/data/test.xxx";
-        const data = cli_msg.sw_fn_arg;
+        // const url = "/pwa9c/data/test.xxx";
+        const arg = cli_msg.sw_fn_arg;
+        const url=arg.url;
+        const text=arg.text;
         caches.open(CACHE_NAME)
             .then((cache) => {
                 const rqs = new Request(url);
-                const rsp = new Response(data);
+                const rsp = new Response(text);
                 cache.put(rqs, rsp);
             });
     },

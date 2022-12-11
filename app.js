@@ -156,7 +156,12 @@ const getCacheUrl = function () {
 };
 
 const putCache = function () {
-  const msg = buildMessageCli("putCache", "Prova con Camomilla");
+  const url = "/pwa9c/data/test.xxx";
+  const arg={
+    url:url,
+    text:"Prova con Camomilla"
+  };
+  const msg = buildMessageCli("putCache", arg);
   postMessageToSW(msg);
 };
 
