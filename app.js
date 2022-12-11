@@ -101,7 +101,6 @@ const ReceiveMsgRsp = {
   },
   getCache: function (sw_msg) {
     const data = sw_msg.cli_fn_arg || "";
-    ualog(data);
     msg_prn(item1, data);
   },
 };
@@ -157,10 +156,10 @@ const getCacheUrl = function () {
 
 const setCache = function (key,text) {
   // const url = "/pwa9c/data/test.xxx";
-  const url="pippo";
+  const url=key;
   const arg = {
     url: url,
-    text: "Prova con Camomilla e Pippo"
+    text: text
   };
   const msg = buildMessageCli("setCache", arg);
   postMessageToSW(msg);
@@ -168,7 +167,7 @@ const setCache = function (key,text) {
 
 const getCache = function (key) {
   // const url = "/pwa9c/data/test.xxx";
-  const url="pippo";
+  const url=key;
   const cli_msg = buildMessageCli("getCache", url);
   postMessageToSW(cli_msg);
 };

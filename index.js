@@ -134,3 +134,14 @@ const showList = function (lst) {
     // wnd.setXY(100,100);
     // wnd.setHtml(t).show();
 };
+
+const setCacheTest = function () {
+    const text = "Testo di Prova";
+    const key = "key1";
+    setCache(key, text);
+};
+
+const getCacheTest = function () {
+    const key = "key1";
+    getCache(key);
+};
