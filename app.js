@@ -155,14 +155,14 @@ const getCacheUrl = function () {
   postMessageToSW(cli_msg);
 };
 
-const putCache = function (key,text) {
+const setCache = function (key,text) {
   // const url = "/pwa9c/data/test.xxx";
   const url="pippo";
   const arg = {
     url: url,
     text: "Prova con Camomilla e Pippo"
   };
-  const msg = buildMessageCli("putCache", arg);
+  const msg = buildMessageCli("setCache", arg);
   postMessageToSW(msg);
 };
 

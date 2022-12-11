@@ -322,7 +322,7 @@ const SenderMsgRsp = {
         });
     },
     //AAA
-    putCache: function (cli_msg) {
+    setCache: function (cli_msg) {
         // const url = "/pwa9c/data/test.xxx";
         const arg = cli_msg.sw_fn_arg;
         const url = arg.url;
