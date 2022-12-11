@@ -65,10 +65,6 @@ if ("serviceWorker" in navigator) {
 //gestione messaggi
 ////////////////////
 
-const receivesError = function (event) {
-  console.log(event);
-  alert(event);
-};
 
 const receivesMessage = function (event) {
   try {
@@ -101,7 +97,13 @@ const ReceiveMsgRsp = {
     const data = sw_msg.cli_fn_arg || {};
     const s = JSON.stringify(data);
     msg_prn(item1, s);
-  }
+  },
+  //AAA
+  getCahe: function (sw_msg) {
+    const data = sw_msg.cli_fn_arg || "";
+    ualog(data);
+    msg_prn(item1, data);
+  },
 };
 
 const postMessageToSW = function (msg) {
@@ -118,6 +120,8 @@ const buildMessageCli = function (sw_fn, sw_fn_arg = null) {
     sw_fn_arg: sw_fn_arg
   };
 };
+
+///////////////////////
 
 const testMsgLog = function () {
   const fn_name = arguments.callee.name;
@@ -148,6 +152,16 @@ const testFn = function () {
   const url = "/pwa9c/data/anag.json";
   const cli_msg = buildMessageCli("readCacheUrl", url);
   postMessageToSW(cli_msg);
+};
+
+const putCache=function(){
+  const msg=buildMessageCli("putCache","Prova con Camomilla");
+  postMessageToSW(msg);
+};
+
+const getCache=function(){
+  const msg=buildMessageCli("getCache");
+  postMessageToSW(msg);
 };
 
 ////////////////////////////////////////

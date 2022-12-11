@@ -1,9 +1,13 @@
 /*jshint esversion:8 */
 
-const fnx=function(v){
-    const n=arguments.callee.name;
-    console.log(v);
-    console.log(n);
-};
+let a = 0;
+const s = a || "pippo";
+const n = a || 100;
+const ss = a ?? "pippo";
+const nn = a ?? 100;
 
-fnx("pippo");
+console.clear();
+console.log(s);
+console.log(n);
+console.log(ss);
+console.log(nn);

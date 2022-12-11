@@ -226,7 +226,7 @@ self.addEventListener('message', (event) => {
         SenderMsgRsp[sw_fn](cli_msg, event);
     }
     catch (err) {
-        console.err(err);
+        console.error(err);
     }
 });
 
@@ -254,7 +254,7 @@ const SenderMsgRsp = {
         const msg = this.buildMessage(cli_msg, data);
         this.postMessage(msg);
     },
-    testMsgPrn: function (cli_msg,event) {
+    testMsgPrn: function (cli_msg, event) {
         const cli_data = cli_msg.sw_fn_arg;
         const data = `received from client ${cli_data}`;
         const msg = this.buildMessage(cli_msg, data);
@@ -279,7 +279,7 @@ const SenderMsgRsp = {
             // this.postMessage(sw_msg);
         });
     },
-    readCacheUrl: function (cli_msg,event) {
+    readCacheUrl: function (cli_msg, event) {
         swlog("readCacheUrl");
         const url = cli_msg.sw_fn_arg;
         return caches.open(CACHE_NAME).then((cache) => {
@@ -296,6 +296,26 @@ const SenderMsgRsp = {
             event.source.postMessage(msg);
             // this.postMessage(msg);
         });
+    },
+    //AAA
+    putCache: function (cli_msg) {
+        const url = "/ua";
+        const data = cli_msg.cli_fn_arg;
+        caches.open(CACHE_NAME)
+            .then((cache) => {
+                cache.put(url, data);
+            });
+    },
+    getCache: function (cli_msg, event) {
+        const url = "/ua";
+        caches.open(CACHE_NAME)
+            .then((cache) => {
+                return cache.match(url)
+                    .then((rsp) => {
+                        const msg = this.buildMessage(cli_msg, rsp);
+                        event.source.postMessage(msg);
+                    });
+            });
     }
 };
 
