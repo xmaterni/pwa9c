@@ -2,27 +2,28 @@
 // "use strict";
 
 const swlog = function (txt) {
-    console.log(txt);
+    // console.log(txt);
     if (ualog_active)
         SenderMsgPush.ualog(txt);
 };
 
-const logRequest = function (request) {
-    swlog("-----------------------------");
-    swlog("url:" + request.url);
-    swlog("destination:" + request.destination);
+const logRequest = function (request, strategy) {
+    console.log("-----------------------------");
+    console.log("url:" + request.url);
+    console.log("destination:" + request.destination);
     // const s = JSON.stringify(request.headers);
     // swlog("SW headers:" + s);
-    swlog("method:" + request.method);
-    swlog("mode:" + request.mode);
+    console.log("method:" + request.method);
+    console.log("mode:" + request.mode);
     // swlog("SW cache:" + request.cache);
     const url = new URL(request.url);
     // swlog("hostname:" + url.hostname);
     // swlog("host:" + url.host);
     // swlog("port:" + url.port);
-    swlog("pathname:" + url.pathname);
-    swlog("origin:" + url.origin);
-    swlog(".............................");
+    console.log("pathname:" + url.pathname);
+    console.log("origin:" + url.origin);
+    console.log("*** strategy:" + strategy)
+    console.log(".............................\n");
 };
 
 
@@ -108,8 +109,15 @@ self.addEventListener('activate', (event) => {
 ///////////////////////
 // fetch
 ///////////////////////
+/*
+destination:
+audio, audioworklet, document, embed, font, frame, 
+iframe, image, manifest, object, paintworklet, 
+report, script, sharedworker, style, track, video, 
+worker or xslt strings, 
+or the empty string, which is the default value.
+*/
 self.addEventListener('fetch', (event) => {
-    // logRequest(event.request);
     const dest = event.request.destination;
     const mode = event.request.mode;
     const info = "";
@@ -119,8 +127,11 @@ self.addEventListener('fetch', (event) => {
         strategy = "cn";
     else if (["script"].includes(dest))
         strategy = "svr";
+    else if (["xxx"].includes(dest))
+        strategy = "c";
     if (mode == "cors")
         strategy = "nc";
+    logRequest(event.request, strategy);
     // 
     if (strategy == "n") {
         swlog(`network only (${info})`);
@@ -185,6 +196,18 @@ const cacheFirst = (event) => {
         }));
 };
 
+const cacheOnly = (event) => {
+    event.respondWith(caches.open(CACHE_NAME)
+        .then((cache) => {
+            return cache.match(event.request.url)
+                .then((cachedResponse) => {
+                    if (cachedResponse) {
+                        swlog("cacheOnly cache");
+                        return cachedResponse;
+                    }
+                });
+        }));
+};
 
 //cache first and network update cache 
 //else 
@@ -223,6 +246,7 @@ self.addEventListener('message', (event) => {
     try {
         const cli_msg = event.data;
         const sw_fn = cli_msg.sw_fn;
+        console.log("cli_msg:" + cli_msg);
         SenderMsgRsp[sw_fn](cli_msg, event);
     }
     catch (err) {
@@ -299,24 +323,41 @@ const SenderMsgRsp = {
     },
     //AAA
     putCache: function (cli_msg) {
-        const url = "/ua";
-        const data = cli_msg.cli_fn_arg;
+        const url = "/pwa9c/data/test.xxx";
+        const data = cli_msg.sw_fn_arg;
         caches.open(CACHE_NAME)
             .then((cache) => {
-                cache.put(url, data);
+                const rqs = new Request(url);
+                const rsp = new Response(data);
+                cache.put(rqs, rsp);
             });
     },
     getCache: function (cli_msg, event) {
-        const url = "/ua";
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                return cache.match(url)
-                    .then((rsp) => {
-                        const msg = this.buildMessage(cli_msg, rsp);
-                        event.source.postMessage(msg);
-                    });
-            });
+        swlog("getCache");
+        const url = cli_msg.sw_fn_arg;
+        console.log("hetCache url:"+url);
+        return caches.open(CACHE_NAME).then((cache) => {
+            return cache.match(url);
+        }).then((response) => {
+            return response.text();
+        }).then((json) => {
+            const msg = this.buildMessage(cli_msg, json);
+            event.source.postMessage(msg);
+            // this.postMessage(msg);
+        });
     }
+    // xgetCache: function (cli_msg, event) {
+    //     const url = "/pwa9c/data/test";
+    //     caches.open(CACHE_NAME)
+    //         .then((cache) => {
+    //             return cache.match(url)
+    //                 .then((rsp) => {
+    //                     console.log(rsp);
+    //                     const msg = this.buildMessage(cli_msg, rsp);
+    //                     event.source.postMessage(msg);
+    //                 });
+    //         });
+    // }
 };
 
 

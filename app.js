@@ -1,4 +1,4 @@
-/*jshint esversion:8 */
+/*jshint esversion:11 */
 
 const RELEASE = "0.1.7";
 const SW_NAME = "/pwa9c/sw.js";
@@ -73,7 +73,8 @@ const receivesMessage = function (event) {
     ReceiveMsgRsp[cli_fn](sw_msg);
   }
   catch (err) {
-    alert(err);
+    msg = `${err}`;
+    alert(msg);
   }
 };
 
@@ -98,14 +99,14 @@ const ReceiveMsgRsp = {
     const s = JSON.stringify(data);
     msg_prn(item1, s);
   },
-  //AAA
-  getCahe: function (sw_msg) {
+  getCache: function (sw_msg) {
     const data = sw_msg.cli_fn_arg || "";
     ualog(data);
     msg_prn(item1, data);
   },
 };
 
+////////////////////////////////////
 const postMessageToSW = function (msg) {
   if (navigator.serviceWorker.controller) {
     navigator.serviceWorker.controller.postMessage(msg);
@@ -147,21 +148,22 @@ const readCacheSW = function () {
   postMessageToSW(msg);
 };
 
-const testFn = function () {
+const getCacheUrl = function () {
   // const url="http://127.0.0.1:5501/pwa9c/data/anag.json";
   const url = "/pwa9c/data/anag.json";
   const cli_msg = buildMessageCli("readCacheUrl", url);
   postMessageToSW(cli_msg);
 };
 
-const putCache=function(){
-  const msg=buildMessageCli("putCache","Prova con Camomilla");
+const putCache = function () {
+  const msg = buildMessageCli("putCache", "Prova con Camomilla");
   postMessageToSW(msg);
 };
 
-const getCache=function(){
-  const msg=buildMessageCli("getCache");
-  postMessageToSW(msg);
+const getCache = function () {
+  const url = "/pwa9c/data/test.xxx";
+  const cli_msg = buildMessageCli("getCache", url);
+  postMessageToSW(cli_msg);
 };
 
 ////////////////////////////////////////
