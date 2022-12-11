@@ -42,7 +42,7 @@ if ("serviceWorker" in navigator) {
         log('active');
         //listen to messages
         navigator.serviceWorker.onmessage = receivesMessage;
-        navigator.serviceWorker.onerror = receivesError;
+        // navigator.serviceWorker.onerror = receivesError;
       }
       if (sw) {
         sw.addEventListener("statechange", (e) => {
@@ -71,10 +71,6 @@ const receivesError = function (event) {
 };
 
 const receivesMessage = function (event) {
-  if (!event.data) {
-    alert("event.data null");
-    return;
-  }
   try {
     const sw_msg = event.data;
     const cli_fn = sw_msg.cli_fn;
@@ -86,10 +82,6 @@ const receivesMessage = function (event) {
 };
 
 const ReceiveMsgRsp = {
-  default: function (sw_msg) {
-    s = `default\n sw_msg:${sw_msg}`;
-    alert(s);
-  },
   ualog: function (sw_msg) {
     ualog(sw_msg.cli_fn_arg);
   },
@@ -151,29 +143,12 @@ const readCacheSW = function () {
   postMessageToSW(msg);
 };
 
-
-// const testFn = function () {
-//   navigator.serviceWorker.onmessage = (event) => {
-//     const sw_msg = event.data;
-//     const data = sw_msg.cli_fn_arg || {};
-//     const s = JSON.stringify(data);
-//     msg_prn(item1, s);
-//   };
-//   // const url="http://127.0.0.1:5501/pwa9c/data/anag.json";
-//   const url = "/pwa9c/data/anag.json";
-//   // const fn_name = arguments.callee.name;
-//   const msg = buildMessageCli(null, url,"readCacheUrl");
-//   postMessageToWorker(msg);
-// };
-
-
 const testFn = function () {
   // const url="http://127.0.0.1:5501/pwa9c/data/anag.json";
   const url = "/pwa9c/data/anag.json";
   const cli_msg = buildMessageCli("readCacheUrl", url);
   postMessageToSW(cli_msg);
 };
-
 
 ////////////////////////////////////////
 
@@ -202,7 +177,7 @@ function clearCaches() {
 function reset() {
   clearCaches();
   unregistAll();
-  reload();
+  window.location.reload();
 }
 
 function reload() {
