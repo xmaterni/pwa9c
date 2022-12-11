@@ -2,7 +2,7 @@
 // "use strict";
 
 const swlog = function (txt) {
-    // console.log(txt);
+    console.log(txt);
     if (ualog_active)
         SenderMsgPush.ualog(txt);
 };
@@ -12,16 +12,16 @@ const logRequest = function (request, strategy) {
     console.log("url:" + request.url);
     console.log("destination:" + request.destination);
     // const s = JSON.stringify(request.headers);
-    // swlog("SW headers:" + s);
+    // console.log("SW headers:" + s);
     console.log("method:" + request.method);
     console.log("mode:" + request.mode);
-    // swlog("SW cache:" + request.cache);
+    // console.log("SW cache:" + request.cache);
     const url = new URL(request.url);
-    // swlog("hostname:" + url.hostname);
-    // swlog("host:" + url.host);
-    // swlog("port:" + url.port);
-    console.log("pathname:" + url.pathname);
-    console.log("origin:" + url.origin);
+    // console.log("hostname:" + url.hostname);
+    // console.log("host:" + url.host);
+    // console.log("port:" + url.port);
+    // console.log("pathname:" + url.pathname);
+    // console.log("origin:" + url.origin);
     console.log("*** strategy:" + strategy)
     console.log(".............................\n");
 };
@@ -121,18 +121,17 @@ self.addEventListener('fetch', (event) => {
     const dest = event.request.destination;
     const mode = event.request.mode;
     const info = "";
-    // 
+     
     let strategy = "n";
     if (["document", "style", "image", "audio"].includes(dest))
         strategy = "cn";
     else if (["script"].includes(dest))
         strategy = "svr";
-    else if (["xxx"].includes(dest))
-        strategy = "c";
     if (mode == "cors")
         strategy = "nc";
+
     logRequest(event.request, strategy);
-    // 
+
     if (strategy == "n") {
         swlog(`network only (${info})`);
         return networkOnly(event);
@@ -150,7 +149,7 @@ self.addEventListener('fetch', (event) => {
         return staleWhileRevalidate(event);
     }
     else {
-        console.err("fetch nell");
+        console.err("fetch null");
         return;
     }
 });
@@ -254,7 +253,6 @@ self.addEventListener('message', (event) => {
     }
 });
 
-
 const SenderMsgRsp = {
     buildMessage: function (cli_msg, cli_fn_arg = null, cli_fn = null) {
         let fn = cli_msg.sw_fn;
@@ -300,7 +298,6 @@ const SenderMsgRsp = {
         }).then((urls) => {
             const msg = this.buildMessage(cli_msg, urls);
             event.source.postMessage(msg);
-            // this.postMessage(sw_msg);
         });
     },
     readCacheUrl: function (cli_msg, event) {
@@ -318,12 +315,9 @@ const SenderMsgRsp = {
         }).then((json) => {
             const msg = this.buildMessage(cli_msg, json);
             event.source.postMessage(msg);
-            // this.postMessage(msg);
         });
     },
-    //AAA
     setCache: function (cli_msg) {
-        // const url = "/pwa9c/data/test.xxx";
         const arg = cli_msg.sw_fn_arg;
         const url = arg.url;
         const text = arg.text;
@@ -346,24 +340,11 @@ const SenderMsgRsp = {
             const msg = this.buildMessage(cli_msg, text);
             event.source.postMessage(msg);
         }).catch(() => {
-            const msg = this.buildMessage(cli_msg,"");
+            const msg = this.buildMessage(cli_msg, "");
             event.source.postMessage(msg);
         });
     }
-    // xgetCache: function (cli_msg, event) {
-    //     const url = "/pwa9c/data/test";
-    //     caches.open(CACHE_NAME)
-    //         .then((cache) => {
-    //             return cache.match(url)
-    //                 .then((rsp) => {
-    //                     console.log(rsp);
-    //                     const msg = this.buildMessage(cli_msg, rsp);
-    //                     event.source.postMessage(msg);
-    //                 });
-    //         });
-    // }
 };
-
 
 const SenderMsgPush = {
     buildMessage: (cli_fn, cli_fn_arg = null) => {

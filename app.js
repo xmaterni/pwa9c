@@ -70,7 +70,7 @@ const receivesMessage = function (event) {
   try {
     const sw_msg = event.data;
     const cli_fn = sw_msg.cli_fn;
-    ReceiveMsgRsp[cli_fn](sw_msg);
+    MenagerMessageRceived[cli_fn](sw_msg);
   }
   catch (err) {
     msg = `${err}`;
@@ -78,7 +78,7 @@ const receivesMessage = function (event) {
   }
 };
 
-const ReceiveMsgRsp = {
+const MenagerMessageRceived = {
   ualog: function (sw_msg) {
     ualog(sw_msg.cli_fn_arg);
   },
@@ -106,6 +106,7 @@ const ReceiveMsgRsp = {
 };
 
 ////////////////////////////////////
+
 const postMessageToSW = function (msg) {
   if (navigator.serviceWorker.controller) {
     navigator.serviceWorker.controller.postMessage(msg);
@@ -148,7 +149,6 @@ const listCacheUrls = function () {
 };
 
 const getCacheUrl = function () {
-  // const url="http://127.0.0.1:5501/pwa9c/data/anag.json";
   const url = "/pwa9c/data/anag.json";
   const cli_msg = buildMessageCli("readCacheUrl", url);
   postMessageToSW(cli_msg);
@@ -172,7 +172,7 @@ const getCache = function (key) {
   postMessageToSW(cli_msg);
 };
 
-////////////////////////////////////////
+////////////////////////////////////////////////////////
 
 function unregist() {
   if ('serviceWorker' in navigator) {
