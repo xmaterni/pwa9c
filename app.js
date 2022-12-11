@@ -156,17 +156,19 @@ const getCacheUrl = function () {
 };
 
 const putCache = function (key,text) {
-  const url = "/pwa9c/data/test.xxx";
+  // const url = "/pwa9c/data/test.xxx";
+  const url="pippo";
   const arg = {
     url: url,
-    text: "Prova con Camomilla"
+    text: "Prova con Camomilla e Pippo"
   };
   const msg = buildMessageCli("putCache", arg);
   postMessageToSW(msg);
 };
 
 const getCache = function (key) {
-  const url = "/pwa9c/data/test.xxx";
+  // const url = "/pwa9c/data/test.xxx";
+  const url="pippo";
   const cli_msg = buildMessageCli("getCache", url);
   postMessageToSW(cli_msg);
 };

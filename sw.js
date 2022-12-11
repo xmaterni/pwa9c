@@ -325,8 +325,8 @@ const SenderMsgRsp = {
     putCache: function (cli_msg) {
         // const url = "/pwa9c/data/test.xxx";
         const arg = cli_msg.sw_fn_arg;
-        const url=arg.url;
-        const text=arg.text;
+        const url = arg.url;
+        const text = arg.text;
         caches.open(CACHE_NAME)
             .then((cache) => {
                 const rqs = new Request(url);
@@ -337,15 +337,17 @@ const SenderMsgRsp = {
     getCache: function (cli_msg, event) {
         swlog("getCache");
         const url = cli_msg.sw_fn_arg;
-        console.log("hetCache url:"+url);
+        console.log("hetCache url:" + url);
         return caches.open(CACHE_NAME).then((cache) => {
             return cache.match(url);
         }).then((response) => {
             return response.text();
-        }).then((json) => {
-            const msg = this.buildMessage(cli_msg, json);
+        }).then((text) => {
+            const msg = this.buildMessage(cli_msg, text);
             event.source.postMessage(msg);
-            // this.postMessage(msg);
+        }).catch(() => {
+            const msg = this.buildMessage(cli_msg,"");
+            event.source.postMessage(msg);
         });
     }
     // xgetCache: function (cli_msg, event) {
