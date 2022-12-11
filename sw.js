@@ -288,7 +288,7 @@ const SenderMsgRsp = {
     toggleUaLog: function (cli_msg) {
         ualog_active = !ualog_active;
     },
-    readCacheSW: function (cli_msg, event) {
+    listCacheUrls: function (cli_msg, event) {
         swlog("readCache");
         return caches.open(CACHE_NAME).then((cache) => {
             return cache.keys();

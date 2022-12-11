@@ -90,7 +90,7 @@ const ReceiveMsgRsp = {
     const data = sw_msg.cli_fn_arg;
     app_log(data);
   },
-  readCacheSW: function (sw_msg) {
+  listCacheUrls: function (sw_msg) {
     const data = sw_msg.cli_fn_arg || [];
     showList(data);
   },
@@ -142,7 +142,7 @@ const toggleUaLog = function () {
   postMessageToSW(msg);
 };
 
-const readCacheSW = function () {
+const listCacheUrls = function () {
   const fn_name = arguments.callee.name;
   const msg = buildMessageCli(fn_name);
   postMessageToSW(msg);
