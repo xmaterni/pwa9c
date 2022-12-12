@@ -74,9 +74,9 @@ const receiveMessage = function (event) {
   try {
     const name = msg.name;
     const methods = Object.getOwnPropertyNames(ReceiversMessage);
-    if(!methods.includes(name)){
-      const s=JSON.stringify(msg);
-      const err=`ERROR in message\nmessage:${s} `;
+    if (!methods.includes(name)) {
+      const s = JSON.stringify(msg);
+      const err = `ERROR in message\nmessage:${s} `;
       alert(err);
       return;
     };
@@ -122,19 +122,24 @@ const testMsgLog = function () {
 };
 
 const testMsgPrn = function () {
-  const fn = function (event) {
-    navigator.serviceWorker.onmessage = receiveMessage;
-    const msg = event.data;
-    const data = msg.data;
-    app_log(data);
-  };
+  // const fn = function (event) {
+  //   navigator.serviceWorker.onmessage = receiveMessage;
+  //   const msg = event.data;
+  //   const data = msg.data;
+  //   app_log(data);
+  // };
   const name = arguments.callee.name;
   const msg = {
     name: name,
     ops: {},
     data: "Test Prn"
   };
-  navigator.serviceWorker.onmessage = fn;
+  navigator.serviceWorker.onmessage = (event)=> {
+    navigator.serviceWorker.onmessage = receiveMessage;
+    const msg = event.data;
+    const data = msg.data;
+    app_log(data);
+  };
   postMessage(msg);
 };
 
