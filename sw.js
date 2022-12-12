@@ -307,7 +307,7 @@ const MessageResponder = {
     },
     setCache: function (msg) {
         const url = msg.ops.url;
-        const data = msg.datta;
+        const data = msg.data;
         caches.open(CACHE_NAME)
             .then((cache) => {
                 const rqs = new Request(url);
@@ -317,7 +317,7 @@ const MessageResponder = {
     },
     getCache: function (msg, event) {
         swlog("getCache");
-        const url = msg.data;
+        const url = msg.ops.key;
         console.log("hetCache url:" + url);
         return caches.open(CACHE_NAME).then((cache) => {
             return cache.match(url);

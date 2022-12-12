@@ -165,7 +165,7 @@ const getCacheUrl = function (url,call) {
 
 const setCache = function (key, text) {
   const name = arguments.callee.name;
-  const msg = buildMessage(name, { key: key }, text);
+  const msg = buildMessage(name, { url: key }, text);
   postMessage(msg);
 };
 
