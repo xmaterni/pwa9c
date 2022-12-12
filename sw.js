@@ -9,20 +9,22 @@ const swlog = function (txt) {
 
 const logRequest = function (request, strategy) {
     console.log("-----------------------------");
-    console.log("url:" + request.url);
-    console.log("destination:" + request.destination);
-    // const s = JSON.stringify(request.headers);
-    // console.log("SW headers:" + s);
-    console.log("method:" + request.method);
-    console.log("mode:" + request.mode);
-    // console.log("SW cache:" + request.cache);
     const url = new URL(request.url);
     // console.log("hostname:" + url.hostname);
     // console.log("host:" + url.host);
     // console.log("port:" + url.port);
-    // console.log("pathname:" + url.pathname);
+    console.log("pathname:" + url.pathname);
     // console.log("origin:" + url.origin);
-    console.log("*** strategy:" + strategy)
+      
+    // console.log("url:" + request.url);
+    console.log("destination:" + request.destination);
+    // const s = JSON.stringify(request.headers);
+    // console.log("SW headers:" + s);
+    // console.log("method:" + request.method);
+    console.log("mode:" + request.mode);
+    // console.log("SW cache:" + request.cache);
+
+    console.log("*** strategy:" + strategy);
     console.log(".............................\n");
 };
 
@@ -130,7 +132,7 @@ self.addEventListener('fetch', (event) => {
     if (mode == "cors")
         strategy = "nc";
 
-    logRequest(event.request, strategy);
+    // logRequest(event.request, strategy);
 
     if (strategy == "n") {
         swlog(`network only (${info})`);

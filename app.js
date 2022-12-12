@@ -20,6 +20,9 @@ const app_log = function (txt) {
 };
 
 
+"use strict";
+
+
 let SW_STATE = "unregistred";
 
 if ("serviceWorker" in navigator) {
@@ -115,7 +118,7 @@ const postMessageToSW = function (msg) {
   }
 };
 
-const buildMessageCli = function (sw_fn, sw_fn_arg = null) {
+const buildMessageToSW = function (sw_fn, sw_fn_arg = null) {
   return {
     sw_fn: sw_fn,
     sw_fn_arg: sw_fn_arg
@@ -126,49 +129,45 @@ const buildMessageCli = function (sw_fn, sw_fn_arg = null) {
 
 const testMsgLog = function () {
   const fn_name = arguments.callee.name;
-  const msg = buildMessageCli(fn_name, "Test Log");
+  const msg = buildMessageToSW(fn_name, "Test Log");
   postMessageToSW(msg);
 };
 
 const testMsgPrn = function () {
   const fn_name = arguments.callee.name;
-  const msg = buildMessageCli(fn_name, "Test Prn");
+  const msg = buildMessageToSW(fn_name, "Test Prn");
   postMessageToSW(msg);
 };
 
 const toggleUaLog = function () {
   const fn_name = arguments.callee.name;
-  const msg = buildMessageCli(fn_name);
+  const msg = buildMessageToSW(fn_name);
   postMessageToSW(msg);
 };
 
 const listCacheUrls = function () {
   const fn_name = arguments.callee.name;
-  const msg = buildMessageCli(fn_name);
+  const msg = buildMessageToSW(fn_name);
   postMessageToSW(msg);
 };
 
 const getCacheUrl = function () {
   const url = "/pwa9c/data/anag.json";
-  const cli_msg = buildMessageCli("readCacheUrl", url);
+  const cli_msg = buildMessageToSW("readCacheUrl", url);
   postMessageToSW(cli_msg);
 };
 
-const setCache = function (key,text) {
-  // const url = "/pwa9c/data/test.xxx";
-  const url=key;
+const setCache = function (key, text) {
   const arg = {
-    url: url,
+    url: key,
     text: text
   };
-  const msg = buildMessageCli("setCache", arg);
+  const msg = buildMessageToSW("setCache", arg);
   postMessageToSW(msg);
 };
 
 const getCache = function (key) {
-  // const url = "/pwa9c/data/test.xxx";
-  const url=key;
-  const cli_msg = buildMessageCli("getCache", url);
+  const cli_msg = buildMessageToSW("getCache", key);
   postMessageToSW(cli_msg);
 };
 
