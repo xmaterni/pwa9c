@@ -143,7 +143,8 @@ const listCacheUrlsTest = function () {
 
 const getCacheUrlTest = function () {
     const fn = function (data) {
-        msg_prn(item1, data);
+        const s=JSON.stringify(data);
+        msg_prn(item1, s);
     };
     const url = "/pwa9c/data/anag.json";
     getCacheUrl(url, fn);

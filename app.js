@@ -110,7 +110,7 @@ const testMsgLog = function () {
     navigator.serviceWorker.onmessage = receiveMessage;
     const msg = event.data;
     const data = msg.data;
-    app_log(data);
+    UaLog.log_show(data);
   };
   const name = arguments.callee.name;
   const msg = buildMessage(name, {}, "Test Log");
