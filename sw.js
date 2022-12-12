@@ -255,6 +255,25 @@ self.addEventListener('message', (event) => {
     }
 });
 
+const MessagePusher = {
+    postMessage: (message) => {
+        return self.clients.matchAll().then(clients => {
+            clients.forEach((client) => {
+                client.postMessage(message);
+            });
+        });
+    },
+    ualog: function (text) {
+        const msg= {
+            name: "ualog",
+            ops: null,
+            data: text
+        };
+        this.postMessage(msg);
+    }
+};
+
+
 const MessageResponder = {
     testMsgLog: function (msg, event) {
         swlog("testMsgLog");
@@ -329,23 +348,6 @@ const MessageResponder = {
     }
 };
 
-const MessagePusher = {
-    postMessage: (message) => {
-        return self.clients.matchAll().then(clients => {
-            clients.forEach((client) => {
-                client.postMessage(message);
-            });
-        });
-    },
-    ualog: function (text) {
-        const msg= {
-            name: "ualog",
-            ops: null,
-            data: text
-        };
-        this.postMessage(msg);
-    }
-};
 
 
 

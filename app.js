@@ -97,13 +97,6 @@ const postMessage = function (msg) {
   }
 };
 
-const buildMessage = function (name, ops = {}, data = "") {
-  return {
-    name: name,
-    ops: ops,
-    data: data
-  };
-};
 
 const testMsgLog = function () {
   const fn = function (event) {
@@ -113,7 +106,11 @@ const testMsgLog = function () {
     UaLog.log_show(data);
   };
   const name = arguments.callee.name;
-  const msg = buildMessage(name, {}, "Test Log");
+  const msg = {
+    name: name,
+    ops: {},
+    data: "Test Log"
+  };
   navigator.serviceWorker.onmessage = fn;
   postMessage(msg);
 };
@@ -126,14 +123,22 @@ const testMsgPrn = function () {
     app_log(data);
   };
   const name = arguments.callee.name;
-  const msg = buildMessage(name, {}, "Test Prn");
+  const msg = {
+    name: name,
+    ops: {},
+    data: "Test Prn"
+  };
   navigator.serviceWorker.onmessage = fn;
   postMessage(msg);
 };
 
 const toggleUaLog = function () {
   const name = arguments.callee.name;
-  const msg = buildMessage(name);
+  const msg = {
+    name: name,
+    ops: {},
+    data: ""
+  };
   postMessage(msg);
 };
 
@@ -145,12 +150,16 @@ const listCacheUrls = function (call) {
     call(data);
   };
   const name = arguments.callee.name;
-  const msg = buildMessage(name);
+  const msg = {
+    name: name,
+    ops: {},
+    data: ""
+  };
   navigator.serviceWorker.onmessage = fn;
   postMessage(msg);
 };
 
-const getCacheUrl = function (url,call) {
+const getCacheUrl = function (url, call) {
   const fn = function (event) {
     navigator.serviceWorker.onmessage = receiveMessage;
     const msg = event.data;
@@ -158,14 +167,22 @@ const getCacheUrl = function (url,call) {
     call(data);
   };
   const name = arguments.callee.name;
-  const msg = buildMessage(name, { url: url });
+  const msg = {
+    name: name,
+    ops: { url: url },
+    data: ""
+  };
   navigator.serviceWorker.onmessage = fn;
   postMessage(msg);
 };
 
 const setCache = function (key, text) {
   const name = arguments.callee.name;
-  const msg = buildMessage(name, { url: key }, text);
+  const msg = {
+    name: name,
+    ops: { url: key },
+    data: text
+  };
   postMessage(msg);
 };
 
@@ -177,7 +194,11 @@ const getCache = function (key, call) {
     call(data);
   };
   const name = arguments.callee.name;
-  const msg = buildMessage(name, { key: key });
+  const msg = {
+    name: name,
+    ops: { key: key },
+    data: ""
+  };
   navigator.serviceWorker.onmessage = fn;
   postMessage(msg);
 };
