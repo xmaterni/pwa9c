@@ -44,7 +44,7 @@ if ("serviceWorker" in navigator) {
         SW_STATE = "active";
         log('active');
         //listen to messages
-        navigator.serviceWorker.onmessage = receivesMessage;
+        navigator.serviceWorker.onmessage = receiveMessage;
         // navigator.serviceWorker.onerror = receivesError;
       }
       if (sw) {
@@ -69,48 +69,27 @@ if ("serviceWorker" in navigator) {
 ////////////////////
 
 
-const receivesMessage = function (event) {
+const receiveMessage = function (event) {
+  let msg = event.data;
   try {
-    const sw_msg = event.data;
-    const cli_fn = sw_msg.cli_fn;
-    MenagerMessageRceived[cli_fn](sw_msg);
+    const name = msg.name;
+    ReceiveMessageManager[name](msg);
   }
   catch (err) {
-    msg = `${err}`;
-    alert(msg);
+    let j = JSON.stringify(msg);
+    const s = `${err}\nmsg:${j}`;
+    alert(s);
   }
 };
 
-const MenagerMessageRceived = {
-  ualog: function (sw_msg) {
-    ualog(sw_msg.cli_fn_arg);
-  },
-  testMsgLog: function (sw_msg) {
-    const data = sw_msg.cli_fn_arg;
+const ReceiveMessageManager = {
+  ualog: function (msg) {
+    const data = msg.data;
     ualog(data);
-  },
-  testMsgPrn: function (sw_msg) {
-    const data = sw_msg.cli_fn_arg;
-    app_log(data);
-  },
-  listCacheUrls: function (sw_msg) {
-    const data = sw_msg.cli_fn_arg || [];
-    showList(data);
-  },
-  readCacheUrl: function (sw_msg) {
-    const data = sw_msg.cli_fn_arg || {};
-    const s = JSON.stringify(data);
-    msg_prn(item1, s);
-  },
-  getCache: function (sw_msg) {
-    const data = sw_msg.cli_fn_arg || "";
-    msg_prn(item1, data);
-  },
+  }
 };
 
-////////////////////////////////////
-
-const postMessageToSW = function (msg) {
+const postMessage = function (msg) {
   if (navigator.serviceWorker.controller) {
     navigator.serviceWorker.controller.postMessage(msg);
   } else {
@@ -118,58 +97,91 @@ const postMessageToSW = function (msg) {
   }
 };
 
-const buildMessageToSW = function (sw_fn, sw_fn_arg = null) {
+const buildMessage = function (name, ops = {}, data = "") {
   return {
-    sw_fn: sw_fn,
-    sw_fn_arg: sw_fn_arg
+    name: name,
+    ops: ops,
+    data: data
   };
 };
 
-///////////////////////
-
 const testMsgLog = function () {
-  const fn_name = arguments.callee.name;
-  const msg = buildMessageToSW(fn_name, "Test Log");
-  postMessageToSW(msg);
+  const fn = function (event) {
+    navigator.serviceWorker.onmessage = receiveMessage;
+    const msg = event.data;
+    const data = msg.data;
+    app_log(data);
+  };
+  const name = arguments.callee.name;
+  const msg = buildMessage(name, {}, "Test Log");
+  navigator.serviceWorker.onmessage = fn;
+  postMessage(msg);
 };
 
 const testMsgPrn = function () {
-  const fn_name = arguments.callee.name;
-  const msg = buildMessageToSW(fn_name, "Test Prn");
-  postMessageToSW(msg);
+  const fn = function (event) {
+    navigator.serviceWorker.onmessage = receiveMessage;
+    const msg = event.data;
+    const data = msg.data;
+    app_log(data);
+  };
+  const name = arguments.callee.name;
+  const msg = buildMessage(name, {}, "Test Prn");
+  navigator.serviceWorker.onmessage = fn;
+  postMessage(msg);
 };
 
 const toggleUaLog = function () {
-  const fn_name = arguments.callee.name;
-  const msg = buildMessageToSW(fn_name);
-  postMessageToSW(msg);
+  const name = arguments.callee.name;
+  const msg = buildMessage(name);
+  postMessage(msg);
 };
 
-const listCacheUrls = function () {
-  const fn_name = arguments.callee.name;
-  const msg = buildMessageToSW(fn_name);
-  postMessageToSW(msg);
+const listCacheUrls = function (call) {
+  const fn = function (event) {
+    navigator.serviceWorker.onmessage = receiveMessage;
+    const msg = event.data;
+    const data = msg.data;
+    call(data);
+  };
+  const name = arguments.callee.name;
+  const msg = buildMessage(name);
+  navigator.serviceWorker.onmessage = fn;
+  postMessage(msg);
 };
 
-const getCacheUrl = function () {
-  const url = "/pwa9c/data/anag.json";
-  const cli_msg = buildMessageToSW("readCacheUrl", url);
-  postMessageToSW(cli_msg);
+const getCacheUrl = function (url,call) {
+  const fn = function (event) {
+    navigator.serviceWorker.onmessage = receiveMessage;
+    const msg = event.data;
+    const data = msg.data;
+    call(data);
+  };
+  const name = arguments.callee.name;
+  const msg = buildMessage(name, { url: url });
+  navigator.serviceWorker.onmessage = fn;
+  postMessage(msg);
 };
 
 const setCache = function (key, text) {
-  const arg = {
-    url: key,
-    text: text
-  };
-  const msg = buildMessageToSW("setCache", arg);
-  postMessageToSW(msg);
+  const name = arguments.callee.name;
+  const msg = buildMessage(name, { key: key }, text);
+  postMessage(msg);
 };
 
-const getCache = function (key) {
-  const cli_msg = buildMessageToSW("getCache", key);
-  postMessageToSW(cli_msg);
+const getCache = function (key, call) {
+  const fn = function (event) {
+    navigator.serviceWorker.onmessage = receiveMessage;
+    const msg = event.data;
+    const data = msg.data;
+    call(data);
+  };
+  const name = arguments.callee.name;
+  const msg = buildMessage(name, { key: key });
+  navigator.serviceWorker.onmessage = fn;
+  postMessage(msg);
 };
+
 
 ////////////////////////////////////////////////////////
 

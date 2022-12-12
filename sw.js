@@ -4,7 +4,7 @@
 const swlog = function (txt) {
     console.log(txt);
     if (ualog_active)
-        SenderMsgPush.ualog(txt);
+        MessagePusher.ualog(txt);
 };
 
 const logRequest = function (request, strategy) {
@@ -15,7 +15,7 @@ const logRequest = function (request, strategy) {
     // console.log("port:" + url.port);
     console.log("pathname:" + url.pathname);
     // console.log("origin:" + url.origin);
-      
+
     // console.log("url:" + request.url);
     console.log("destination:" + request.destination);
     // const s = JSON.stringify(request.headers);
@@ -123,7 +123,7 @@ self.addEventListener('fetch', (event) => {
     const dest = event.request.destination;
     const mode = event.request.mode;
     const info = "";
-     
+
     let strategy = "n";
     if (["document", "style", "image", "audio"].includes(dest))
         strategy = "cn";
@@ -245,50 +245,36 @@ const staleWhileRevalidate = (event) => {
 
 self.addEventListener('message', (event) => {
     try {
-        const cli_msg = event.data;
-        const sw_fn = cli_msg.sw_fn;
-        console.log("cli_msg:" + cli_msg);
-        SenderMsgRsp[sw_fn](cli_msg, event);
+        const msg = event.data;
+        const name = msg.name;
+        console.log("msg:" + JSON.stringify(msg));
+        MessageResponder[name](msg, event);
     }
     catch (err) {
         console.error(err);
     }
 });
 
-const SenderMsgRsp = {
-    buildMessage: function (cli_msg, cli_fn_arg = null, cli_fn = null) {
-        let fn = cli_msg.sw_fn;
-        if (!!cli_fn)
-            fn = cli_fn;
-        return {
-            cli_fn: fn,
-            cli_fn_arg: cli_fn_arg
-        };
-    },
-    postMessage: function (message) {
-        return self.clients.matchAll().then(clients => {
-            clients.forEach((client) => {
-                client.postMessage(message);
-            });
-        });
-    },
-    testMsgLog: function (cli_msg) {
-        const cli_data = cli_msg.sw_fn_arg;
-        const data = `received from client ${cli_data}`;
-        const msg = this.buildMessage(cli_msg, data);
-        this.postMessage(msg);
-    },
-    testMsgPrn: function (cli_msg, event) {
-        const cli_data = cli_msg.sw_fn_arg;
-        const data = `received from client ${cli_data}`;
-        const msg = this.buildMessage(cli_msg, data);
-        // this.postMessage(sw_msg);
+const MessageResponder = {
+    // postMessage: function (message) {
+    //     return self.clients.matchAll().then(clients => {
+    //         clients.forEach((client) => {
+    //             client.postMessage(message);
+    //         });
+    //     });
+    // },
+    testMsgLog: function (msg, event) {
+        msg.data = `received from client ${msg.data}`;
         event.source.postMessage(msg);
     },
-    toggleUaLog: function (cli_msg) {
+    testMsgPrn: function (msg, event) {
+        msg.data = `received from client ${msg.data}`;
+        event.source.postMessage(msg);
+    },
+    toggleUaLog: function () {
         ualog_active = !ualog_active;
     },
-    listCacheUrls: function (cli_msg, event) {
+    listCacheUrls: function (msg, event) {
         swlog("readCache");
         return caches.open(CACHE_NAME).then((cache) => {
             return cache.keys();
@@ -298,13 +284,13 @@ const SenderMsgRsp = {
                 lst.push(rqs.url);
             return lst;
         }).then((urls) => {
-            const msg = this.buildMessage(cli_msg, urls);
+            msg.data=urls;
             event.source.postMessage(msg);
         });
     },
-    readCacheUrl: function (cli_msg, event) {
-        swlog("readCacheUrl");
-        const url = cli_msg.sw_fn_arg;
+    getCacheUrl: function (msg, event) {
+        swlog("getCacheUrl");
+        const url = msg.ops.url;
         return caches.open(CACHE_NAME).then((cache) => {
             // const ops = {
             //     ignoreSearch: true,
@@ -315,46 +301,39 @@ const SenderMsgRsp = {
         }).then((response) => {
             return response.json();
         }).then((json) => {
-            const msg = this.buildMessage(cli_msg, json);
+            msg.data=json;
             event.source.postMessage(msg);
         });
     },
-    setCache: function (cli_msg) {
-        const arg = cli_msg.sw_fn_arg;
-        const url = arg.url;
-        const text = arg.text;
+    setCache: function (msg) {
+        const url = msg.ops.url;
+        const data = msg.datta;
         caches.open(CACHE_NAME)
             .then((cache) => {
                 const rqs = new Request(url);
-                const rsp = new Response(text);
+                const rsp = new Response(data);
                 cache.put(rqs, rsp);
             });
     },
-    getCache: function (cli_msg, event) {
+    getCache: function (msg, event) {
         swlog("getCache");
-        const url = cli_msg.sw_fn_arg;
+        const url = msg.data;
         console.log("hetCache url:" + url);
         return caches.open(CACHE_NAME).then((cache) => {
             return cache.match(url);
         }).then((response) => {
             return response.text();
         }).then((text) => {
-            const msg = this.buildMessage(cli_msg, text);
+            msg.data = text;
             event.source.postMessage(msg);
         }).catch(() => {
-            const msg = this.buildMessage(cli_msg, "");
+            msg.data = "";
             event.source.postMessage(msg);
         });
     }
 };
 
-const SenderMsgPush = {
-    buildMessage: (cli_fn, cli_fn_arg = null) => {
-        return {
-            cli_fn: cli_fn,
-            cli_fn_arg: cli_fn_arg
-        };
-    },
+const MessagePusher = {
     postMessage: (message) => {
         return self.clients.matchAll().then(clients => {
             clients.forEach((client) => {
@@ -363,8 +342,12 @@ const SenderMsgPush = {
         });
     },
     ualog: function (text) {
-        const sw_msg = this.buildMessage("ualog", text);
-        this.postMessage(sw_msg);
+        const msg= {
+            name: "ualog",
+            ops: null,
+            data: text
+        };
+        this.postMessage(msg);
     }
 };
 

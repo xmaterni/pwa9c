@@ -134,6 +134,21 @@ const showList = function (lst) {
     // wnd.setXY(100,100);
     // wnd.setHtml(t).show();
 };
+const listCacheUrlsTest = function () {
+    const fn = function (data) {
+        showList(data);
+    };
+    listCacheUrls(fn);
+};
+
+const getCacheUrlTest = function () {
+    const fn = function (data) {
+        msg_prn(item1, data);
+    };
+    const url = "/pwa9c/data/anag.json";
+    getCacheUrl(url, fn);
+};
+
 
 const setCacheTest = function () {
     const text = "Testo di Prova";
@@ -143,5 +158,8 @@ const setCacheTest = function () {
 
 const getCacheTest = function () {
     const key = "key1";
-    getCache(key);
+    const fn = function (data) {
+        msg_prn(item1, data);
+    };
+    getCache(key, fn);
 };
