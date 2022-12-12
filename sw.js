@@ -256,18 +256,13 @@ self.addEventListener('message', (event) => {
 });
 
 const MessageResponder = {
-    // postMessage: function (message) {
-    //     return self.clients.matchAll().then(clients => {
-    //         clients.forEach((client) => {
-    //             client.postMessage(message);
-    //         });
-    //     });
-    // },
     testMsgLog: function (msg, event) {
+        swlog("testMsgLog");
         msg.data = `received from client ${msg.data}`;
         event.source.postMessage(msg);
     },
     testMsgPrn: function (msg, event) {
+        swlog("testMsgPrn");
         msg.data = `received from client ${msg.data}`;
         event.source.postMessage(msg);
     },
@@ -306,6 +301,7 @@ const MessageResponder = {
         });
     },
     setCache: function (msg) {
+        swlog("setCache");
         const url = msg.ops.url;
         const data = msg.data;
         caches.open(CACHE_NAME)
