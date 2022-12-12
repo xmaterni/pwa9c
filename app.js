@@ -73,7 +73,14 @@ const receiveMessage = function (event) {
   let msg = event.data;
   try {
     const name = msg.name;
-    ReceiveMessageManager[name](msg);
+    const methods = Object.getOwnPropertyNames(ReceiversMessage);
+    if(!methods.includes(name)){
+      const s=JSON.stringify(msg);
+      const err=`ERROR in message\nmessage:${s} `;
+      alert(err);
+      return;
+    };
+    ReceiversMessage[name](msg);
   }
   catch (err) {
     let j = JSON.stringify(msg);
@@ -82,7 +89,7 @@ const receiveMessage = function (event) {
   }
 };
 
-const ReceiveMessageManager = {
+const ReceiversMessage = {
   ualog: function (msg) {
     const data = msg.data;
     ualog(data);
@@ -96,7 +103,6 @@ const postMessage = function (msg) {
     alert(`Error(4) app.js ServiceWorker not activated \n ${SW_NAME}`);
   }
 };
-
 
 const testMsgLog = function () {
   const fn = function (event) {
