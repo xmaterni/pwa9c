@@ -157,6 +157,7 @@ self.addEventListener('fetch', (event) => {
 });
 
 const networkOnly = (event) => {
+    swlog("networkOnly");
     event.respondWith(fetch(event.request));
 };
 
@@ -241,37 +242,17 @@ const staleWhileRevalidate = (event) => {
 //////////////////////
 // gestione messaggi
 ///////////////////////
-
-
 self.addEventListener('message', (event) => {
     try {
         const msg = event.data;
         const name = msg.name;
-        console.log("msg:" + JSON.stringify(msg));
+        // console.log("msg:" + JSON.stringify(msg));
         MessageResponder[name](msg, event);
     }
     catch (err) {
         console.error(err);
     }
 });
-
-const MessagePusher = {
-    postMessage: (message) => {
-        return self.clients.matchAll().then(clients => {
-            clients.forEach((client) => {
-                client.postMessage(message);
-            });
-        });
-    },
-    ualog: function (text) {
-        const msg= {
-            name: "ualog",
-            ops: null,
-            data: text
-        };
-        this.postMessage(msg);
-    }
-};
 
 
 const MessageResponder = {
@@ -298,7 +279,7 @@ const MessageResponder = {
                 lst.push(rqs.url);
             return lst;
         }).then((urls) => {
-            msg.data=urls;
+            msg.data = urls;
             event.source.postMessage(msg);
         });
     },
@@ -315,7 +296,7 @@ const MessageResponder = {
         }).then((response) => {
             return response.json();
         }).then((json) => {
-            msg.data=json;
+            msg.data = json;
             event.source.postMessage(msg);
         });
     },
@@ -345,6 +326,24 @@ const MessageResponder = {
             msg.data = "";
             event.source.postMessage(msg);
         });
+    }
+};
+
+const MessagePusher = {
+    postMessage: (message) => {
+        return self.clients.matchAll().then(clients => {
+            clients.forEach((client) => {
+                client.postMessage(message);
+            });
+        });
+    },
+    ualog: function (text) {
+        const msg = {
+            name: "ualog",
+            ops: null,
+            data: text
+        };
+        this.postMessage(msg);
     }
 };
 

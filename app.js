@@ -122,12 +122,6 @@ const testMsgLog = function () {
 };
 
 const testMsgPrn = function () {
-  // const fn = function (event) {
-  //   navigator.serviceWorker.onmessage = receiveMessage;
-  //   const msg = event.data;
-  //   const data = msg.data;
-  //   app_log(data);
-  // };
   const name = arguments.callee.name;
   const msg = {
     name: name,
