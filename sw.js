@@ -122,7 +122,7 @@ or the empty string, which is the default value.
 self.addEventListener('fetch', (event) => {
     const dest = event.request.destination;
     const mode = event.request.mode;
-    const info = "";
+    const info = event.request.url;
 
     let strategy = "n";
     if (["document", "style", "image", "audio"].includes(dest))
@@ -239,6 +239,44 @@ const staleWhileRevalidate = (event) => {
         }));
 };
 
+/////////////////////
+//cache setter/getter
+//////////////////////
+
+const setCacheData = function (url, data) {
+    caches.open(CACHE_NAME)
+        .then((cache) => {
+            const rqs = new Request(url);
+            const rsp = new Response(data);
+            cache.put(rqs, rsp);
+        });
+};
+
+// const ops = {
+//     ignoreSearch: true,
+//     ignoreMethod: true,
+//     ignoreVary: true
+// };
+const getCacheText = function (url) {
+    return caches.open(CACHE_NAME).then((cache) => {
+        return cache.match(url);
+    }).then((response) => {
+        return response.text();
+    }).catch(() => {
+        return "";
+    });
+};
+
+const getCacheJson = function (url) {
+    return caches.open(CACHE_NAME).then((cache) => {
+        return cache.match(url);
+    }).then((response) => {
+        return response.json();
+    }).catch(() => {
+        return {};
+    });
+};
+
 //////////////////////
 // gestione messaggi
 ///////////////////////
@@ -283,49 +321,27 @@ const MessageResponder = {
             event.source.postMessage(msg);
         });
     },
-    getCacheUrl: function (msg, event) {
+    getCacheUrl: async function (msg, event) {
         swlog("getCacheUrl");
         const url = msg.ops.url;
-        return caches.open(CACHE_NAME).then((cache) => {
-            // const ops = {
-            //     ignoreSearch: true,
-            //     ignoreMethod: true,
-            //     ignoreVary: true
-            // };
-            return cache.match(url);
-        }).then((response) => {
-            return response.json();
-        }).then((json) => {
-            msg.data = json;
-            event.source.postMessage(msg);
-        });
+        const json = await getCacheJson(url);
+        msg.data = json;
+        event.source.postMessage(msg);
     },
     setCache: function (msg) {
         swlog("setCache");
         const url = msg.ops.url;
         const data = msg.data;
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                const rqs = new Request(url);
-                const rsp = new Response(data);
-                cache.put(rqs, rsp);
-            });
+        setCacheData(url, data);
     },
     getCache: function (msg, event) {
         swlog("getCache");
         const url = msg.ops.key;
-        console.log("hetCache url:" + url);
-        return caches.open(CACHE_NAME).then((cache) => {
-            return cache.match(url);
-        }).then((response) => {
-            return response.text();
-        }).then((text) => {
-            msg.data = text;
-            event.source.postMessage(msg);
-        }).catch(() => {
-            msg.data = "";
-            event.source.postMessage(msg);
-        });
+        getCacheText(url)
+            .then((text) => {
+                msg.data = text;
+                event.source.postMessage(msg);
+            });
     }
 };
 
