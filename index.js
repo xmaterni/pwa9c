@@ -126,7 +126,6 @@ const showList = function (lst) {
     const t = jt.text();
     const item1 = document.getElementById("item1");
     item1.innerHTML = t;
-
     // const l=item1.querySelector(".list");
     // UaDrag(l);
     // const wnd = UaWindowAdm.create("list_");
@@ -134,33 +133,40 @@ const showList = function (lst) {
     // wnd.setXY(100,100);
     // wnd.setHtml(t).show();
 };
-const listCacheUrlsTest = function () {
+const cacheKeysTest = function () {
     const fn = function (data) {
         showList(data);
     };
-    listCacheUrls(fn);
+    cacheKeys(fn);
 };
 
 const getCacheJsonTest = function () {
     const fn = function (data) {
-        const s=JSON.stringify(data);
+        const s = JSON.stringify(data);
         msg_prn(item1, s);
     };
-    const url = "/pwa9c/data/anag.json";
-    getCacheJson(url, fn);
+    const key = "/pwa9c/data/anag.json";
+    getCacheJson(key, fn);
 };
 
+CACHE_APP = "cahe_app1";
 
-const setCacheTest = function () {
+const setCacheApp = function () {
     const text = "Testo di Prova";
     const key = "key1";
-    setCache(key, text);
+    setCache(key, text, CACHE_APP);
+    {
+    const text = "Testo di Prova2";
+    const key = "key2";
+    setCache(key, text, CACHE_APP);
+    }
 };
 
-const getCacheTextTest = function () {
-    const key = "key1";
+const getCacheTextApp = function () {
+    // const key = "key2";
+    const key = "key2";
     const fn = function (data) {
         msg_prn(item1, data);
     };
-    getCacheText(key, fn);
+    getCacheText(key, fn, CACHE_APP);
 };

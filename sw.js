@@ -27,13 +27,13 @@ const logRequest = function (request, strategy) {
     console.log(".............................\n");
 };
 
-"use strict";
+"use strict";  //jshint ignore:line
 
 ////////////////////
 //dialogo app-sw
 ////////////////////
 
-const CACHE_NAME = "pwa9c_1";
+const CACHE_NAME_SW = "pwa9c_1";
 let clilog_active = false;
 
 const config = {
@@ -84,7 +84,7 @@ const config = {
 
 self.addEventListener('install', (event) => {
     swlog("install " + config.version);
-    event.waitUntil(caches.open(CACHE_NAME)
+    event.waitUntil(caches.open(CACHE_NAME_SW)
         .then((cache) => cache.addAll(config.staticCacheItems))
         .then(() => self.skipWaiting())
     );
@@ -96,7 +96,7 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((keys) => {
             return Promise.all(
                 keys.map((cache_key) => {
-                    if (cache_key !== CACHE_NAME) {
+                    if (cache_key !== CACHE_NAME_SW) {
                         return caches.delete(cache_key);
                     }
                 })
@@ -165,7 +165,7 @@ const networkFirst = (event) => {
     event.respondWith(fetch(event.request)
         .then((networkResponse) => {
             swlog("networkFirst net");
-            return caches.open(CACHE_NAME)
+            return caches.open(CACHE_NAME_SW)
                 .then((cache) => {
                     cache.put(event.request, networkResponse.clone());
                     return networkResponse;
@@ -180,7 +180,7 @@ const networkFirst = (event) => {
 
 
 const cacheFirst = (event) => {
-    event.respondWith(caches.open(CACHE_NAME)
+    event.respondWith(caches.open(CACHE_NAME_SW)
         .then((cache) => {
             return cache.match(event.request.url)
                 .then((cachedResponse) => {
@@ -199,7 +199,7 @@ const cacheFirst = (event) => {
 };
 
 const cacheOnly = (event) => {
-    event.respondWith(caches.open(CACHE_NAME)
+    event.respondWith(caches.open(CACHE_NAME_SW)
         .then((cache) => {
             return cache.match(event.request.url)
                 .then((cachedResponse) => {
@@ -215,7 +215,7 @@ const cacheOnly = (event) => {
 //else 
 //network and update cache)
 const staleWhileRevalidate = (event) => {
-    event.respondWith(caches.open(CACHE_NAME)
+    event.respondWith(caches.open(CACHE_NAME_SW)
         .then((cache) => {
             return cache.match(event.request.url)
                 .then((cachedResponse) => {
@@ -244,8 +244,9 @@ const staleWhileRevalidate = (event) => {
 //////////////////////
 
 const CacheManager = {
-    set: function (key, data) {
-        caches.open(CACHE_NAME)
+    set: function (key, data, cache_key = null) {
+        const cache_name = cache_key || CACHE_NAME_SW;
+        caches.open(cache_name)
             .then((cache) => {
                 const rqs = new Request(key);
                 const rsp = new Response(data);
@@ -257,8 +258,9 @@ const CacheManager = {
     //     ignoreMethod: true,
     //     ignoreVary: true
     // };
-    getText: function (key) {
-        return caches.open(CACHE_NAME).then((cache) => {
+    getText: function (key, cache_key = null) {
+        const cache_name = cache_key || CACHE_NAME_SW;
+        return caches.open(cache_name).then((cache) => {
             return cache.match(key);
         }).then((response) => {
             return response.text();
@@ -266,8 +268,9 @@ const CacheManager = {
             return "";
         });
     },
-    getJson: function (key) {
-        return caches.open(CACHE_NAME).then((cache) => {
+    getJson: function (key, cache_key = null) {
+        const cache_name = cache_key || CACHE_NAME_SW;
+        return caches.open(cache_name).then((cache) => {
             return cache.match(key);
         }).then((response) => {
             return response.json();
@@ -276,13 +279,13 @@ const CacheManager = {
         });
     },
     keys: function () {
-        return caches.open(CACHE_NAME).then((cache) => {
+        return caches.open(CACHE_NAME_SW).then((cache) => {
             return cache.keys();
         }).then((requests) => {
-            const URLS = [];
+            const keys = [];
             for (let rqs of requests)
-                URLS.push(rqs.url);
-            return URLS;
+                keys.push(rqs.url);
+            return keys;
         });
     }
 };
@@ -314,29 +317,29 @@ const MessageResponder = {
     toggleLogSW: function () {
         clilog_active = !clilog_active;
     },
-    listCacheUrls: async function (msg, event) {
-        swlog("listCacheUrls");
+    cacheKeys: async function (msg, event) {
+        swlog("cacheKeys");
         const urls = await CacheManager.keys();
         msg.data = urls;
         event.source.postMessage(msg);
     },
     getCacheJson: async function (msg, event) {
         swlog("getCacheJson");
-        const url = msg.ops.url;
-        const json = await CacheManager.getJson(url);
+        const key = msg.ops.key;
+        const json = await CacheManager.getJson(key);
         msg.data = json;
         event.source.postMessage(msg);
     },
     setCache: function (msg) {
         swlog("setCache");
-        const url = msg.ops.url;
+        const key = msg.ops.key;
         const data = msg.data;
-        CacheManager.set(url, data);
+        CacheManager.set(key, data);
     },
     getCacheText: function (msg, event) {
         swlog("getCache");
-        const url = msg.ops.key;
-        CacheManager.getText(url)
+        const key = msg.ops.key;
+        CacheManager.getText(key)
             .then((text) => {
                 msg.data = text;
                 event.source.postMessage(msg);

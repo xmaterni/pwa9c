@@ -20,7 +20,7 @@ const app_log = function (txt) {
 };
 
 
-"use strict";
+"use strict"; //jshint ignore:line
 
 
 let SW_STATE = "unregistred";
@@ -79,7 +79,7 @@ const receiveMessage = function (event) {
       const err = `ERROR receiveMessage\nmessage:${s} `;
       alert(err);
       return;
-    };
+    }
     ReceiversMessage[name](msg);
   }
   catch (err) {
@@ -126,7 +126,7 @@ const testMsgPrn = function () {
     ops: {},
     data: "Test Msg Prn"
   };
-  navigator.serviceWorker.onmessage = (event)=> {
+  navigator.serviceWorker.onmessage = (event) => {
     navigator.serviceWorker.onmessage = receiveMessage;
     const msg = event.data;
     const data = msg.data;
@@ -136,70 +136,75 @@ const testMsgPrn = function () {
 };
 
 const toggleLogSW = function () {
-  const name = arguments.callee.name;
   const msg = {
-    name: name,
+    name: toggleLogSW.nsme,
     ops: {},
     data: ""
   };
   postMessage(msg);
 };
 
-const listCacheUrls = function (call) {
+const cacheKeys = function (call) {
   const fn = function (event) {
     navigator.serviceWorker.onmessage = receiveMessage;
     const msg = event.data;
     const data = msg.data;
     call(data);
   };
-  const name = arguments.callee.name;
+  const name = cacheKeys.name;
   const msg = {
     name: name,
-    ops: {},
+    ops: { },
     data: ""
   };
   navigator.serviceWorker.onmessage = fn;
   postMessage(msg);
 };
 
-const getCacheJson = function (url, call) {
-  const fn = function (event) {
-    navigator.serviceWorker.onmessage = receiveMessage;
-    const msg = event.data;
-    const data = msg.data;
-    call(data);
-  };
-  const name = arguments.callee.name;
+const setCache = function (key, text, cacche_name = null) {
   const msg = {
-    name: name,
-    ops: { url: url },
-    data: ""
-  };
-  navigator.serviceWorker.onmessage = fn;
-  postMessage(msg);
-};
-
-const setCache = function (key, text) {
-  const name = arguments.callee.name;
-  const msg = {
-    name: name,
-    ops: { url: key },
+    name: setCache.name,
+    ops: {
+      key: key,
+      cache_name: cacche_name
+    },
     data: text
   };
   postMessage(msg);
 };
 
-const getCacheText = function (key, call) {
+const getCacheText = function (key, call, cache_name = null) {
   const fn = function (event) {
     navigator.serviceWorker.onmessage = receiveMessage;
     const msg = event.data;
     const data = msg.data;
     call(data);
   };
-  const name = arguments.callee.name;
   const msg = {
-    name: name,
-    ops: { key: key },
+    name: getCacheText.name,
+    ops: {
+      key: key,
+      cache_name: cache_name
+    },
+    data: ""
+  };
+  navigator.serviceWorker.onmessage = fn;
+  postMessage(msg);
+};
+
+const getCacheJson = function (key, call, cache_name = null) {
+  const fn = function (event) {
+    navigator.serviceWorker.onmessage = receiveMessage;
+    const msg = event.data;
+    const data = msg.data;
+    call(data);
+  };
+  const msg = {
+    name: getCacheJson.name,
+    ops: {
+      key: key,
+      cache_name: cache_name
+    },
     data: ""
   };
   navigator.serviceWorker.onmessage = fn;
