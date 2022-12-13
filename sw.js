@@ -1,5 +1,4 @@
 /*jshint esversion:8 */
-// "use strict";
 
 const swlog = function (txt) {
     console.log(txt);
@@ -28,6 +27,7 @@ const logRequest = function (request, strategy) {
     console.log(".............................\n");
 };
 
+"use strict";
 
 ////////////////////
 //dialogo app-sw
