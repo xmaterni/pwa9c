@@ -291,26 +291,23 @@ const CacheManager = {
 // gestione messaggi
 ///////////////////////
 self.addEventListener('message', (event) => {
+    const msg = event.data;
+    const name = msg.name;
     try {
-        const msg = event.data;
-        const name = msg.name;
         // console.log("msg:" + JSON.stringify(msg));
         MessageResponder[name](msg, event);
     }
     catch (err) {
-        console.error(err);
+        const s = JSON.stringify(msg);
+        const es = `${err}\nmsg:${s}`;
+        console.error(es);
     }
 });
 
 
 const MessageResponder = {
-    testMsgLog: function (msg, event) {
+    testMsg: function (msg, event) {
         swlog("testMsgLog");
-        msg.data = `received from client ${msg.data}`;
-        event.source.postMessage(msg);
-    },
-    testMsgPrn: function (msg, event) {
-        swlog("testMsgPrn");
         msg.data = `received from client ${msg.data}`;
         event.source.postMessage(msg);
     },
@@ -318,13 +315,13 @@ const MessageResponder = {
         clilog_active = !clilog_active;
     },
     listCacheUrls: async function (msg, event) {
-        swlog("readCache");
-        const urls=await CacheManager.keys();
+        swlog("listCacheUrls");
+        const urls = await CacheManager.keys();
         msg.data = urls;
         event.source.postMessage(msg);
     },
-    getCacheUrl: async function (msg, event) {
-        swlog("getCacheUrl");
+    getCacheJson: async function (msg, event) {
+        swlog("getCacheJson");
         const url = msg.ops.url;
         const json = await CacheManager.getJson(url);
         msg.data = json;
@@ -336,7 +333,7 @@ const MessageResponder = {
         const data = msg.data;
         CacheManager.set(url, data);
     },
-    getCache: function (msg, event) {
+    getCacheText: function (msg, event) {
         swlog("getCache");
         const url = msg.ops.key;
         CacheManager.getText(url)

@@ -141,13 +141,13 @@ const listCacheUrlsTest = function () {
     listCacheUrls(fn);
 };
 
-const getCacheUrlTest = function () {
+const getCacheJsonTest = function () {
     const fn = function (data) {
         const s=JSON.stringify(data);
         msg_prn(item1, s);
     };
     const url = "/pwa9c/data/anag.json";
-    getCacheUrl(url, fn);
+    getCacheJson(url, fn);
 };
 
 
@@ -157,10 +157,10 @@ const setCacheTest = function () {
     setCache(key, text);
 };
 
-const getCacheTest = function () {
+const getCacheTextTest = function () {
     const key = "key1";
     const fn = function (data) {
         msg_prn(item1, data);
     };
-    getCache(key, fn);
+    getCacheText(key, fn);
 };

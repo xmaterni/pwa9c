@@ -111,22 +111,20 @@ const testMsgLog = function () {
     const data = msg.data;
     UaLog.log_show(data);
   };
-  const name = arguments.callee.name;
   const msg = {
-    name: name,
+    name: "testMsg",
     ops: {},
-    data: "Test Log"
+    data: "Test Msg Log"
   };
   navigator.serviceWorker.onmessage = fn;
   postMessage(msg);
 };
 
 const testMsgPrn = function () {
-  const name = arguments.callee.name;
   const msg = {
-    name: name,
+    name: "testMsg",
     ops: {},
-    data: "Test Prn"
+    data: "Test Msg Prn"
   };
   navigator.serviceWorker.onmessage = (event)=> {
     navigator.serviceWorker.onmessage = receiveMessage;
@@ -164,7 +162,7 @@ const listCacheUrls = function (call) {
   postMessage(msg);
 };
 
-const getCacheUrl = function (url, call) {
+const getCacheJson = function (url, call) {
   const fn = function (event) {
     navigator.serviceWorker.onmessage = receiveMessage;
     const msg = event.data;
@@ -191,7 +189,7 @@ const setCache = function (key, text) {
   postMessage(msg);
 };
 
-const getCache = function (key, call) {
+const getCacheText = function (key, call) {
   const fn = function (event) {
     navigator.serviceWorker.onmessage = receiveMessage;
     const msg = event.data;
