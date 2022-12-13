@@ -76,7 +76,7 @@ const receiveMessage = function (event) {
     const methods = Object.getOwnPropertyNames(ReceiversMessage);
     if (!methods.includes(name)) {
       const s = JSON.stringify(msg);
-      const err = `ERROR in message\nmessage:${s} `;
+      const err = `ERROR receiveMessage\nmessage:${s} `;
       alert(err);
       return;
     };
@@ -137,7 +137,7 @@ const testMsgPrn = function () {
   postMessage(msg);
 };
 
-const toggleUaLog = function () {
+const toggleLogSW = function () {
   const name = arguments.callee.name;
   const msg = {
     name: name,

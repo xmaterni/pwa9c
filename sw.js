@@ -3,7 +3,7 @@
 
 const swlog = function (txt) {
     console.log(txt);
-    if (ualog_active)
+    if (clilog_active)
         MessagePusher.ualog(txt);
 };
 
@@ -34,7 +34,7 @@ const logRequest = function (request, strategy) {
 ////////////////////
 
 const CACHE_NAME = "pwa9c_1";
-let ualog_active = false;
+let clilog_active = false;
 
 const config = {
     version: "sw_3",
@@ -243,11 +243,11 @@ const staleWhileRevalidate = (event) => {
 //cache setter/getter
 //////////////////////
 
-const CacheSW = {
-    set: function (url, data) {
+const CacheManager = {
+    set: function (key, data) {
         caches.open(CACHE_NAME)
             .then((cache) => {
-                const rqs = new Request(url);
+                const rqs = new Request(key);
                 const rsp = new Response(data);
                 cache.put(rqs, rsp);
             });
@@ -286,34 +286,6 @@ const CacheSW = {
         });
     }
 };
-// const setCacheData = function (url, data) {
-//     caches.open(CACHE_NAME)
-//         .then((cache) => {
-//             const rqs = new Request(url);
-//             const rsp = new Response(data);
-//             cache.put(rqs, rsp);
-//         });
-// };
-
-// const getCacheText = function (url) {
-//     return caches.open(CACHE_NAME).then((cache) => {
-//         return cache.match(url);
-//     }).then((response) => {
-//         return response.text();
-//     }).catch(() => {
-//         return "";
-//     });
-// };
-
-// const getCacheJson = function (url) {
-//     return caches.open(CACHE_NAME).then((cache) => {
-//         return cache.match(url);
-//     }).then((response) => {
-//         return response.json();
-//     }).catch(() => {
-//         return {};
-//     });
-// };
 
 //////////////////////
 // gestione messaggi
@@ -342,30 +314,19 @@ const MessageResponder = {
         msg.data = `received from client ${msg.data}`;
         event.source.postMessage(msg);
     },
-    toggleUaLog: function () {
-        ualog_active = !ualog_active;
+    toggleLogSW: function () {
+        clilog_active = !clilog_active;
     },
     listCacheUrls: async function (msg, event) {
         swlog("readCache");
-        const urls=await CacheSW.keys();
+        const urls=await CacheManager.keys();
         msg.data = urls;
         event.source.postMessage(msg);
-        // return caches.open(CACHE_NAME).then((cache) => {
-        //     return cache.keys();
-        // }).then((requests) => {
-        //     const lst = [];
-        //     for (let rqs of requests)
-        //         lst.push(rqs.url);
-        //     return lst;
-        // }).then((urls) => {
-        //     msg.data = urls;
-        //     event.source.postMessage(msg);
-        // });
     },
     getCacheUrl: async function (msg, event) {
         swlog("getCacheUrl");
         const url = msg.ops.url;
-        const json = await CacheSW.getJson(url);
+        const json = await CacheManager.getJson(url);
         msg.data = json;
         event.source.postMessage(msg);
     },
@@ -373,12 +334,12 @@ const MessageResponder = {
         swlog("setCache");
         const url = msg.ops.url;
         const data = msg.data;
-        CacheSW.set(url, data);
+        CacheManager.set(url, data);
     },
     getCache: function (msg, event) {
         swlog("getCache");
         const url = msg.ops.key;
-        CacheSW.getText(url)
+        CacheManager.getText(url)
             .then((text) => {
                 msg.data = text;
                 event.source.postMessage(msg);
