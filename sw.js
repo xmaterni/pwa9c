@@ -243,39 +243,77 @@ const staleWhileRevalidate = (event) => {
 //cache setter/getter
 //////////////////////
 
-const setCacheData = function (url, data) {
-    caches.open(CACHE_NAME)
-        .then((cache) => {
-            const rqs = new Request(url);
-            const rsp = new Response(data);
-            cache.put(rqs, rsp);
+const CacheSW = {
+    set: function (url, data) {
+        caches.open(CACHE_NAME)
+            .then((cache) => {
+                const rqs = new Request(url);
+                const rsp = new Response(data);
+                cache.put(rqs, rsp);
+            });
+    },
+    // const ops = {
+    //     ignoreSearch: true,
+    //     ignoreMethod: true,
+    //     ignoreVary: true
+    // };
+    getText: function (key) {
+        return caches.open(CACHE_NAME).then((cache) => {
+            return cache.match(key);
+        }).then((response) => {
+            return response.text();
+        }).catch(() => {
+            return "";
         });
+    },
+    getJson: function (key) {
+        return caches.open(CACHE_NAME).then((cache) => {
+            return cache.match(key);
+        }).then((response) => {
+            return response.json();
+        }).catch(() => {
+            return {};
+        });
+    },
+    keys: function () {
+        return caches.open(CACHE_NAME).then((cache) => {
+            return cache.keys();
+        }).then((requests) => {
+            const URLS = [];
+            for (let rqs of requests)
+                URLS.push(rqs.url);
+            return URLS;
+        });
+    }
 };
-
-// const ops = {
-//     ignoreSearch: true,
-//     ignoreMethod: true,
-//     ignoreVary: true
+// const setCacheData = function (url, data) {
+//     caches.open(CACHE_NAME)
+//         .then((cache) => {
+//             const rqs = new Request(url);
+//             const rsp = new Response(data);
+//             cache.put(rqs, rsp);
+//         });
 // };
-const getCacheText = function (url) {
-    return caches.open(CACHE_NAME).then((cache) => {
-        return cache.match(url);
-    }).then((response) => {
-        return response.text();
-    }).catch(() => {
-        return "";
-    });
-};
 
-const getCacheJson = function (url) {
-    return caches.open(CACHE_NAME).then((cache) => {
-        return cache.match(url);
-    }).then((response) => {
-        return response.json();
-    }).catch(() => {
-        return {};
-    });
-};
+// const getCacheText = function (url) {
+//     return caches.open(CACHE_NAME).then((cache) => {
+//         return cache.match(url);
+//     }).then((response) => {
+//         return response.text();
+//     }).catch(() => {
+//         return "";
+//     });
+// };
+
+// const getCacheJson = function (url) {
+//     return caches.open(CACHE_NAME).then((cache) => {
+//         return cache.match(url);
+//     }).then((response) => {
+//         return response.json();
+//     }).catch(() => {
+//         return {};
+//     });
+// };
 
 //////////////////////
 // gestione messaggi
@@ -307,24 +345,27 @@ const MessageResponder = {
     toggleUaLog: function () {
         ualog_active = !ualog_active;
     },
-    listCacheUrls: function (msg, event) {
+    listCacheUrls: async function (msg, event) {
         swlog("readCache");
-        return caches.open(CACHE_NAME).then((cache) => {
-            return cache.keys();
-        }).then((requests) => {
-            const lst = [];
-            for (let rqs of requests)
-                lst.push(rqs.url);
-            return lst;
-        }).then((urls) => {
-            msg.data = urls;
-            event.source.postMessage(msg);
-        });
+        const urls=await CacheSW.keys();
+        msg.data = urls;
+        event.source.postMessage(msg);
+        // return caches.open(CACHE_NAME).then((cache) => {
+        //     return cache.keys();
+        // }).then((requests) => {
+        //     const lst = [];
+        //     for (let rqs of requests)
+        //         lst.push(rqs.url);
+        //     return lst;
+        // }).then((urls) => {
+        //     msg.data = urls;
+        //     event.source.postMessage(msg);
+        // });
     },
     getCacheUrl: async function (msg, event) {
         swlog("getCacheUrl");
         const url = msg.ops.url;
-        const json = await getCacheJson(url);
+        const json = await CacheSW.getJson(url);
         msg.data = json;
         event.source.postMessage(msg);
     },
@@ -332,12 +373,12 @@ const MessageResponder = {
         swlog("setCache");
         const url = msg.ops.url;
         const data = msg.data;
-        setCacheData(url, data);
+        CacheSW.set(url, data);
     },
     getCache: function (msg, event) {
         swlog("getCache");
         const url = msg.ops.key;
-        getCacheText(url)
+        CacheSW.getText(url)
             .then((text) => {
                 msg.data = text;
                 event.source.postMessage(msg);
