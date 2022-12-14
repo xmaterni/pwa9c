@@ -1,4 +1,4 @@
-/*jshint esversion:8 */
+/*jshint esversion:11 */
 
 const swlog = function (txt) {
     console.log(txt);
@@ -12,17 +12,13 @@ const log = function (args) {
 
 "use strict";  //jshint ignore:line
 
-////////////////////
-//dialogo app-sw
-////////////////////
-
-const CACHE_NAME_SW = "pwa9c_2";
+const CACHE_NAME_SW = "pwa9c_3";
 let clilog_active = false;
 
 const config = {
     version: "sw_3",
     staticCacheItems: [
-        "/pwa9c/",
+        // "/pwa9c/",
         "/pwa9c/index.html",
 
         "/pwa9c/style.less",
@@ -130,7 +126,7 @@ const setStrategy = function (rqs) {
     const dest = rqs.destination;
     const mode = rqs.mode;
     // const headers = rqs.headers;
-    const cache = rqs.cache;
+    // const cache = rqs.cache;
 
     let strategy = SW_NC;
     if (["document", "image", "audio", "manifest"].includes(dest))
@@ -197,7 +193,6 @@ const networkFirst = (event) => {
     );
 };
 
-
 const cacheFirst = (event) => {
     event.respondWith(caches.open(CACHE_NAME_SW)
         .then((cache) => {
@@ -246,7 +241,6 @@ const staleWhileRevalidate = (event) => {
                 .then((cachedResponse) => {
                     if (cachedResponse) {
                         log("staleWhileRevalidate cache");
-
                         //AAA gestire errore in modalita on offline ??
                         fetch(event.request)
                             .then((networkResponse) => {
@@ -263,6 +257,9 @@ const staleWhileRevalidate = (event) => {
                             .then((networkResponse) => {
                                 cache.put(event.request, networkResponse.clone());
                                 return networkResponse;
+                            }).catch((error) => {
+                                //AAA
+                                console.error(`"XXX_3 staleWhileRevalidate\n${url}\n`, error);
                             });
                     }
                 });
@@ -274,8 +271,8 @@ const staleWhileRevalidate = (event) => {
 //////////////////////
 
 const CacheManager = {
-    set: function (key, data, cache_key = null) {
-        const cache_name = cache_key || CACHE_NAME_SW;
+    set: function (key, data, name = null) {
+        const cache_name = name || CACHE_NAME_SW;
         caches.open(cache_name)
             .then((cache) => {
                 const rqs = new Request(key);
@@ -288,8 +285,8 @@ const CacheManager = {
     //     ignoreMethod: true,
     //     ignoreVary: true
     // };
-    getText: function (key, cache_key = null) {
-        const cache_name = cache_key || CACHE_NAME_SW;
+    getText: function (key, name = null) {
+        const cache_name = name || CACHE_NAME_SW;
         return caches.open(cache_name).then((cache) => {
             return cache.match(key);
         }).then((response) => {
@@ -298,8 +295,8 @@ const CacheManager = {
             return "";
         });
     },
-    getJson: function (key, cache_key = null) {
-        const cache_name = cache_key || CACHE_NAME_SW;
+    getJson: function (key, name = null) {
+        const cache_name = name || CACHE_NAME_SW;
         return caches.open(cache_name).then((cache) => {
             return cache.match(key);
         }).then((response) => {
@@ -336,7 +333,6 @@ self.addEventListener('message', (event) => {
         console.error(es);
     }
 });
-
 
 const MessageResponder = {
     testMsg: function (msg, event) {
