@@ -70,8 +70,7 @@ const fn2 = function () {
                 throw new Error("HTTP error, status = " + response.status);
             }
             return response.json();
-        })
-        .then(function (data) {
+        }).then(function (data) {
             const template = (d, i) => {
                 return `<br>
                 ${i}&nbsp;  ${d.id} ${d.cognome} ${d.nome}
@@ -81,8 +80,7 @@ const fn2 = function () {
             jt.append_json_array(data, 1);
             const html = jt.html();
             msg_prn(item1, html);
-        })
-        .catch(function (err) {
+        }).catch(function (err) {
             alert("fn2\n " + err);
         });
 };

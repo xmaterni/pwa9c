@@ -126,33 +126,30 @@ const setStrategy = function (rqs) {
     // "hostname:" + url.hostname);
     // "host:" + url.host);
     // "port:" + url.port);
-    // "pathname:" + url.pathname);
     // "origin:" + url.origin);
     const dest = rqs.destination;
     const mode = rqs.mode;
-    const headers = rqs.headers;
-    const sw_strategy = headers.sw_strategy || "";
+    // const headers = rqs.headers;
+    const cache = rqs.cache;
 
     let strategy = SW_NC;
     if (["document", "image", "audio", "manifest"].includes(dest))
         strategy = SW_CN;
     else if (["script", "style"].includes(dest))
         strategy = SW_SVR;
-    else if (url.pathname.includes(".less"))
+    else if (url.pathname.endsWith(".less"))
         strategy = SW_SVR;
+    else if (url.pathname.endsWith(".json"))
+        strategy = SW_NC;
     else if (mode == "cors")
         strategy = SW_NC;
-
-    if (sw_strategy != "")
-        stategy = sw_strategy;
-
     return {
         "url": url.pathname,
         "destination": dest,
         "mode": mode,
-        "headers": JSON.stringify(headers),
+        // "headers": JSON.stringify(headers),
         // "methos": rqs.method,
-        // "cahe": rqs.cache,
+        // "cahe": cache,
         "strategy": strategy,
         "strategy_name": STRATEGY_NAME[strategy]
     };
@@ -161,7 +158,7 @@ const setStrategy = function (rqs) {
 self.addEventListener('fetch', (event) => {
     const rqs_info = setStrategy(event.request);
     const strategy = rqs_info.strategy;
-    
+
     //TODO log strategy
     log(JSON.stringify(rqs_info, null, 4));
 
