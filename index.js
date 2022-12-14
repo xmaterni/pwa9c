@@ -102,8 +102,13 @@ const fn5 = function (name) {
     // img.style.height = "100%";
     img.style.width = "100%";
     document.getElementById(item1).appendChild(img);
-    const audio = new Audio("/pwa9c/sounds/" + name + ".mp3");
+
+    const src = "/pwa9c/sounds/" + name + ".mp3";
+    const audio = new Audio(src);
+    audio.loop = false;
     audio.play();
+    // const audio = new Audio("/pwa9c/sounds/" + name + ".mp3");
+    // audio.play();
 };
 
 //blocca-sblocca menu
@@ -133,6 +138,7 @@ const showList = function (lst) {
     // wnd.setXY(100,100);
     // wnd.setHtml(t).show();
 };
+
 const cacheKeysTest = function () {
     const fn = function (data) {
         showList(data);
@@ -156,9 +162,9 @@ const setCacheApp = function () {
     const key = "key1";
     setCache(key, text, CACHE_APP);
     {
-    const text = "Testo di Prova2";
-    const key = "key2";
-    setCache(key, text, CACHE_APP);
+        const text = "Testo di Prova2";
+        const key = "key2";
+        setCache(key, text, CACHE_APP);
     }
 };
 

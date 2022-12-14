@@ -239,7 +239,7 @@ function clearCaches() {
 function reset() {
   clearCaches();
   unregistAll();
-  window.location.reload();
+  // window.location.reload();
 }
 
 function reload() {

@@ -6,25 +6,8 @@ const swlog = function (txt) {
         MessagePusher.ualog(txt);
 };
 
-const logRequest = function (request, strategy) {
-    console.log("-----------------------------");
-    const url = new URL(request.url);
-    // console.log("hostname:" + url.hostname);
-    // console.log("host:" + url.host);
-    // console.log("port:" + url.port);
-    console.log("pathname:" + url.pathname);
-    // console.log("origin:" + url.origin);
-
-    // console.log("url:" + request.url);
-    console.log("destination:" + request.destination);
-    // const s = JSON.stringify(request.headers);
-    // console.log("SW headers:" + s);
-    // console.log("method:" + request.method);
-    console.log("mode:" + request.mode);
-    // console.log("SW cache:" + request.cache);
-
-    console.log("*** strategy:" + strategy);
-    console.log(".............................\n");
+const log = function (args) {
+    console.log(args);
 };
 
 "use strict";  //jshint ignore:line
@@ -33,12 +16,13 @@ const logRequest = function (request, strategy) {
 //dialogo app-sw
 ////////////////////
 
-const CACHE_NAME_SW = "pwa9c_1";
+const CACHE_NAME_SW = "pwa9c_2";
 let clilog_active = false;
 
 const config = {
     version: "sw_3",
     staticCacheItems: [
+        "/pwa9c/",
         "/pwa9c/index.html",
 
         "/pwa9c/style.less",
@@ -108,63 +92,101 @@ self.addEventListener('activate', (event) => {
     );
 });
 
+// TODO log gestione errori 
+// self.addEventListener('error', function (e) {
+//     console.error("XXX_", e);
+// });
+
 ///////////////////////
 // fetch
 ///////////////////////
+const SW_N = "n"; //networkOnly
+const SW_C = "c"; //cacheOnly
+const SW_NC = "nc"; //networkFirs
+const SW_CN = "cn"; //cacheFirest
+const SW_SVR = "svr"; //staleWhileRevalidate
+
+const STRATEGY_NAME = {
+    "n": "nwtrworkOnly",
+    "c": "cacheOnly",
+    "nc": "nwtrworkFirst",
+    "cn": "cacheFirst",
+    "svr": "staleWhileRevalidate"
+};
+
 /*
 destination:
 audio, audioworklet, document, embed, font, frame, 
 iframe, image, manifest, object, paintworklet, 
-report, script, sharedworker, style, track, video, 
-worker or xslt strings, 
-or the empty string, which is the default value.
+report, script, sharedworker, style, track, video, worker 
+or xslt strings or the empty string.
 */
+const setStrategy = function (rqs) {
+    const url = new URL(rqs.url);
+    // "hostname:" + url.hostname);
+    // "host:" + url.host);
+    // "port:" + url.port);
+    // "pathname:" + url.pathname);
+    // "origin:" + url.origin);
+    const dest = rqs.destination;
+    const mode = rqs.mode;
+    const headers = rqs.headers;
+    const sw_strategy = headers.sw_strategy || "";
+
+    let strategy = SW_NC;
+    if (["document", "image", "audio", "manifest"].includes(dest))
+        strategy = SW_CN;
+    else if (["script", "style"].includes(dest))
+        strategy = SW_SVR;
+    else if (url.pathname.includes(".less"))
+        strategy = SW_SVR;
+    else if (mode == "cors")
+        strategy = SW_NC;
+
+    if (sw_strategy != "")
+        stategy = sw_strategy;
+
+    return {
+        "url": url.pathname,
+        "destination": dest,
+        "mode": mode,
+        "headers": JSON.stringify(headers),
+        // "methos": rqs.method,
+        // "cahe": rqs.cache,
+        "strategy": strategy,
+        "strategy_name": STRATEGY_NAME[strategy]
+    };
+};
+
 self.addEventListener('fetch', (event) => {
-    const dest = event.request.destination;
-    const mode = event.request.mode;
-    const info = event.request.url;
+    const rqs_info = setStrategy(event.request);
+    const strategy = rqs_info.strategy;
+    
+    //TODO log strategy
+    log(JSON.stringify(rqs_info, null, 4));
 
-    let strategy = "n";
-    if (["document", "style", "image", "audio"].includes(dest))
-        strategy = "cn";
-    else if (["script"].includes(dest))
-        strategy = "svr";
-    if (mode == "cors")
-        strategy = "nc";
-
-    // logRequest(event.request, strategy);
-
-    if (strategy == "n") {
-        swlog(`network only (${info})`);
+    if (strategy == SW_N)
         return networkOnly(event);
-    }
-    else if (strategy == "nc") {
-        swlog(`network first (${info})`);
+    else if (strategy == SW_NC)
         return networkFirst(event);
-    }
-    else if (strategy == "cn") {
-        swlog(`cache first (${info})`);
+    else if (strategy == SW_CN)
         return cacheFirst(event);
-    }
-    else if (strategy == "svr") {
-        swlog(`staleWhileRevalidate (${info})`);
+    else if (strategy == SW_SVR)
         return staleWhileRevalidate(event);
-    }
     else {
-        console.err("fetch null");
+        console.err("XXX_0 fetch null");
         return;
     }
 });
 
 const networkOnly = (event) => {
-    swlog("networkOnly");
     event.respondWith(fetch(event.request));
 };
 
 const networkFirst = (event) => {
     event.respondWith(fetch(event.request)
         .then((networkResponse) => {
-            swlog("networkFirst net");
+            log("networkFirst net");
             return caches.open(CACHE_NAME_SW)
                 .then((cache) => {
                     cache.put(event.request, networkResponse.clone());
@@ -172,7 +194,7 @@ const networkFirst = (event) => {
                 });
         })
         .catch(() => {
-            swlog("networkFirst cache");
+            log("networkFirst cache");
             return caches.match(event.request);
         })
     );
@@ -185,26 +207,31 @@ const cacheFirst = (event) => {
             return cache.match(event.request.url)
                 .then((cachedResponse) => {
                     if (cachedResponse) {
-                        swlog("cacheFirst cache");
+                        log("cacheFirst cache");
                         return cachedResponse;
                     }
                     return fetch(event.request)
                         .then((fetchedResponse) => {
-                            swlog("cacheFirst net");
+                            log("cacheFirst net");
                             cache.put(event.request, fetchedResponse.clone());
                             return fetchedResponse;
+                        }).catch((error) => {
+                            //AAA aggiunti catch
+                            console.error("XXX_1 fetchFirst ", error);
+                            return null;
                         });
                 });
         }));
 };
 
+//TODO come è possibile
 const cacheOnly = (event) => {
     event.respondWith(caches.open(CACHE_NAME_SW)
         .then((cache) => {
             return cache.match(event.request.url)
                 .then((cachedResponse) => {
                     if (cachedResponse) {
-                        swlog("cacheOnly cache");
+                        log("cacheOnly");
                         return cachedResponse;
                     }
                 });
@@ -215,20 +242,26 @@ const cacheOnly = (event) => {
 //else 
 //network and update cache)
 const staleWhileRevalidate = (event) => {
+    const url = event.request.url;
     event.respondWith(caches.open(CACHE_NAME_SW)
         .then((cache) => {
             return cache.match(event.request.url)
                 .then((cachedResponse) => {
                     if (cachedResponse) {
-                        swlog("staleWhileRevalidate cache");
+                        log("staleWhileRevalidate cache");
+
+                        //AAA gestire errore in modalita on offline ??
                         fetch(event.request)
                             .then((networkResponse) => {
                                 cache.put(event.request, networkResponse.clone());
+                            }).catch((error) => {
+                                console.error(`"XXX_2 staleWhileRevalidate\n${url}\n`, error);
                             });
+
                         return cachedResponse;
                     }
                     else {
-                        swlog("staleWhileRevalidate net");
+                        log("staleWhileRevalidate net");
                         return fetch(event.request)
                             .then((networkResponse) => {
                                 cache.put(event.request, networkResponse.clone());
