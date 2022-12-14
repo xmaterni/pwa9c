@@ -136,8 +136,9 @@ const testMsgPrn = function () {
 };
 
 const toggleLogSW = function () {
+  const name = toggleLogSW.name;
   const msg = {
-    name: toggleLogSW.nsme,
+    name: name,
     ops: {},
     data: ""
   };
@@ -154,7 +155,7 @@ const cacheKeys = function (call) {
   const name = cacheKeys.name;
   const msg = {
     name: name,
-    ops: { },
+    ops: {},
     data: ""
   };
   navigator.serviceWorker.onmessage = fn;
