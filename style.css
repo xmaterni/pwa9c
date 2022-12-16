@@ -107,6 +107,15 @@ body {
   overflow-y: auto;
   overflow-x: auto;
 }
+span.info {
+  font-size: clamp(0.8rem, 1.5vw, 1.5rem);
+  color: #ffffff;
+  padding: 0;
+  margin: 0;
+}
+span.info span {
+  padding-right: 50px;
+}
 div.container {
   box-sizing: border-box;
   position: relative;
@@ -122,7 +131,6 @@ div.container {
 }
 div.container div.item {
   box-sizing: border-box;
-  min-height: 50px;
   margin: 0;
   padding: 0;
   font-size: clamp(0.8rem, 1.5vw, 1.5rem);
@@ -131,12 +139,13 @@ div.container div.item {
 div.container div.item0 {
   background-color: #333333;
   flex: 1;
-  padding-top: 10px;
+  padding-top: 2px;
   text-align: center;
+  max-height: 30px;
 }
 div.container div.item1 {
   background-color: #4d4d4d;
-  flex: 10;
+  flex: 20;
 }
 div.item2 {
   background-color: #666666;
