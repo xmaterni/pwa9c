@@ -1,13 +1,12 @@
 /*jshint esversion:11 */
 
+// console.log=()=>{};
+// console.eror=()=>{};
+
 const swlog = function (txt) {
     console.log(txt);
     if (clilog_active)
         MessagePusher.ualog(txt);
-};
-
-const log = function (args) {
-    console.log(args);
 };
 
 "use strict";  //jshint ignore:line
@@ -156,7 +155,7 @@ self.addEventListener('fetch', (event) => {
     const strategy = rqs_info.strategy;
 
     //TODO log strategy
-    log(JSON.stringify(rqs_info, null, 4));
+    console.log(JSON.stringify(rqs_info, null, 4));
 
     if (strategy == SW_N)
         return networkOnly(event);
@@ -179,7 +178,7 @@ const networkOnly = (event) => {
 const networkFirst = (event) => {
     event.respondWith(fetch(event.request)
         .then((networkResponse) => {
-            log("networkFirst net");
+            console.log("networkFirst net");
             return caches.open(CACHE_NAME_SW)
                 .then((cache) => {
                     cache.put(event.request, networkResponse.clone());
@@ -187,28 +186,36 @@ const networkFirst = (event) => {
                 });
         })
         .catch(() => {
-            log("networkFirst cache");
+            console.log("networkFirst cache");
             return caches.match(event.request);
         })
     );
 };
 
+/*
+cahe
+else
+network => cache.puts
+*/
 const cacheFirst = (event) => {
     event.respondWith(caches.open(CACHE_NAME_SW)
         .then((cache) => {
             return cache.match(event.request.url)
                 .then((cachedResponse) => {
                     if (cachedResponse) {
-                        log("cacheFirst cache");
+                        console.log("cacheFirst cache");
                         return cachedResponse;
                     }
                     return fetch(event.request)
                         .then((fetchedResponse) => {
-                            log("cacheFirst net");
-                            cache.put(event.request, fetchedResponse.clone());
+                            console.log("cacheFirst net => chae.put");
+                            if (fetchedResponse.status == 200) {
+                                cache.put(event.request, fetchedResponse.clone());
+                            } else {
+                                console.error("XXX_1 fetchFirst cache.put status:", fetchedResponse.status);
+                            }
                             return fetchedResponse;
                         }).catch((error) => {
-                            //AAA aggiunti catch
                             console.error("XXX_1 fetchFirst ", error);
                             return null;
                         });
@@ -223,16 +230,22 @@ const cacheOnly = (event) => {
             return cache.match(event.request.url)
                 .then((cachedResponse) => {
                     if (cachedResponse) {
-                        log("cacheOnly");
+                        console.log("cacheOnly");
                         return cachedResponse;
                     }
                 });
         }));
 };
 
-//cache first and network update cache 
-//else 
-//network and update cache)
+/*
+cache first and network update cache 
+else 
+network and update cache)
+/*
+cache => network => cache.put
+else
+network => cache.put
+*/
 const staleWhileRevalidate = (event) => {
     const url = event.request.url;
     event.respondWith(caches.open(CACHE_NAME_SW)
@@ -240,7 +253,7 @@ const staleWhileRevalidate = (event) => {
             return cache.match(event.request.url)
                 .then((cachedResponse) => {
                     if (cachedResponse) {
-                        log("staleWhileRevalidate cache");
+                        console.log("staleWhileRevalidate cache");
                         //AAA gestire errore in modalita on offline ??
                         fetch(event.request)
                             .then((networkResponse) => {
@@ -252,7 +265,7 @@ const staleWhileRevalidate = (event) => {
                         return cachedResponse;
                     }
                     else {
-                        log("staleWhileRevalidate net");
+                        console.log("staleWhileRevalidate net");
                         return fetch(event.request)
                             .then((networkResponse) => {
                                 cache.put(event.request, networkResponse.clone());

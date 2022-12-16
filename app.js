@@ -1,11 +1,11 @@
 /*jshint esversion:11 */
 
+// console.log=()=>{};
+// console.eror=()=>{};
+
+
 const RELEASE = "0.1.7";
 const SW_NAME = "/pwa9c/sw.js";
-
-const log = function (...args) {
-  console.log(...args);
-};
 
 const ualog = function (...args) {
   UaLog.log(...args);
@@ -33,23 +33,23 @@ if ("serviceWorker" in navigator) {
       if (registration.installing) {
         sw = registration.installing;
         SW_STATE = "installing";
-        log('installing');
-        log(`scope: ${registration.scope}`);
+        console.log('installing');
+        console.log(`scope: ${registration.scope}`);
       } else if (registration.waiting) {
         sw = registration.waiting;
         SW_STATE = "waiting";
-        log('waiting');
+        console.log('waiting');
       } else if (registration.active) {
         sw = registration.active;
         SW_STATE = "active";
-        log('active');
+        console.log('active');
         //listen to messages
         navigator.serviceWorker.onmessage = receiveMessage;
         // navigator.serviceWorker.onerror = receivesError;
       }
       if (sw) {
         sw.addEventListener("statechange", (e) => {
-          log(`statechange ${e.target.state}`);
+          console.log(`statechange ${e.target.state}`);
         });
       }
       const msg = ` <span>SW ${SW_NAME}</span>
