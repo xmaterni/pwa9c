@@ -54,5 +54,25 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "/pwa9d/disegno800x590.png",
+      "sizes": "800x590",
+      "type": "image/png",
+      "description": "disegno quadroe"
+    },
+    {
+      "src": "/pwa9d/giardino800x480.jpg",
+      "sizes": "800x480",
+      "type": "image/jpg",
+      "description": "giardino viterbo"
+    },
+    {
+      "src": "/pwa9d/giardino12800x680.jpg",
+      "sizes": "1800x680",
+      "type": "image/jpg",
+      "description": "molo capodimonte"
+    }
   ]
 }
