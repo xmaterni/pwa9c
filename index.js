@@ -102,11 +102,19 @@ const fn5 = function (name) {
     document.getElementById(item1).appendChild(img);
 
     const src = "/pwa9c/sounds/" + name + ".mp3";
-    const audio = new Audio(src);
-    audio.loop = false;
-    audio.play();
-    // const audio = new Audio("/pwa9c/sounds/" + name + ".mp3");
+    // let audio = new Audio(src);
+    // audio.loop = false;
     // audio.play();
+
+    const ctx = new AudioContext();
+    fetch(src).then(data => data.arrayBuffer())
+        .then(arrayBuffer => ctx.decodeAudioData(arrayBuffer))
+        .then(decodedAudio => {
+            const playSound = ctx.createBufferSource();
+            playSound.buffer = decodedAudio;
+            playSound.connect(ctx.destination);
+            playSound.start(ctx.currentTime);
+        });
 };
 
 //blocca-sblocca menu

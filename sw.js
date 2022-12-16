@@ -130,6 +130,8 @@ const setStrategy = function (rqs) {
     let strategy = SW_NC;
     if (["document", "image", "audio", "manifest"].includes(dest))
         strategy = SW_CN;
+    else if (url.pathname.endsWith(".mp3"))
+        strategy = SW_CN;
     else if (["script", "style"].includes(dest))
         strategy = SW_SVR;
     else if (url.pathname.endsWith(".less"))
@@ -182,6 +184,7 @@ const networkFirst = (event) => {
             return caches.open(CACHE_NAME_SW)
                 .then((cache) => {
                     cache.put(event.request, networkResponse.clone());
+                    console.log("networkFirst cahae.put");
                     return networkResponse;
                 });
         })
@@ -208,11 +211,12 @@ const cacheFirst = (event) => {
                     }
                     return fetch(event.request)
                         .then((fetchedResponse) => {
-                            console.log("cacheFirst net => chae.put");
+                            console.log("cacheFirst net ");
                             if (fetchedResponse.status == 200) {
                                 cache.put(event.request, fetchedResponse.clone());
+                                console.log("cacheFirst cahae.put");
                             } else {
-                                console.error("XXX_1 fetchFirst cache.put status:", fetchedResponse.status);
+                                console.error("XXX_1 fetchFirst cache.put response:", fetchedResponse);
                             }
                             return fetchedResponse;
                         }).catch((error) => {
@@ -254,7 +258,7 @@ const staleWhileRevalidate = (event) => {
                 .then((cachedResponse) => {
                     if (cachedResponse) {
                         console.log("staleWhileRevalidate cache");
-                        //AAA gestire errore in modalita on offline ??
+                        //TODO gestire errore in modalita on offline ??
                         fetch(event.request)
                             .then((networkResponse) => {
                                 cache.put(event.request, networkResponse.clone());
@@ -271,7 +275,6 @@ const staleWhileRevalidate = (event) => {
                                 cache.put(event.request, networkResponse.clone());
                                 return networkResponse;
                             }).catch((error) => {
-                                //AAA
                                 console.error(`"XXX_3 staleWhileRevalidate\n${url}\n`, error);
                             });
                     }

@@ -11,12 +11,19 @@ const ualog = function (...args) {
   UaLog.log(...args);
 };
 
-const app_info = function (txt) {
-  msg_prn(item0, txt);
-};
-
 const app_log = function (txt) {
   msg_prn(item1, txt);
+};
+
+const app_info = function (sw_name, release, state) {
+  const txt = ` 
+  <span class="info">
+  <span>SW ${sw_name}</span>
+  <span>(${release})</span>
+  <span>${state.toUpperCase()}</span>
+  </span>
+  `;
+  msg_prn(item0, txt);
 };
 
 
@@ -24,6 +31,7 @@ const app_log = function (txt) {
 
 
 let SW_STATE = "unregistred";
+
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
@@ -43,19 +51,14 @@ if ("serviceWorker" in navigator) {
         sw = registration.active;
         SW_STATE = "active";
         console.log('active');
-        //listen to messages
         navigator.serviceWorker.onmessage = receiveMessage;
-        // navigator.serviceWorker.onerror = receivesError;
       }
       if (sw) {
         sw.addEventListener("statechange", (e) => {
           console.log(`statechange ${e.target.state}`);
         });
       }
-      const msg = ` <span>SW ${SW_NAME}</span>
-      <span>(${RELEASE})</span>
-      <span>${SW_STATE.toUpperCase()}</span>`;
-      app_info(msg);
+      app_info(SW_NAME, RELEASE, SW_STATE);
     })
     .catch((error) => {
       alert(`Error(0) app.js\n${SW_NAME}\n ${error}`);
@@ -218,10 +221,13 @@ const getCacheJson = function (key, call, cache_name = null) {
 function unregist() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready.then(registration => {
-      registration.unregister();
+      registration.unregister().then((boolean) => {
+        console.log("unregist:", boolean);
+      });
     });
   }
 }
+
 function unregistAll() {
   navigator.serviceWorker.getRegistrations().then((registrations) => {
     for (let registration of registrations) {
@@ -239,8 +245,8 @@ function clearCaches() {
 
 function reset() {
   clearCaches();
-  unregistAll();
-  // window.location.reload();
+  unregist();
+  app_info(SW_NAME, RELEASE, "unregistred");
 }
 
 function reload() {
