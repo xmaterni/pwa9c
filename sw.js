@@ -11,6 +11,7 @@ const swlog = function (txt) {
 
 "use strict";  //jshint ignore:line
 
+
 const CACHE_NAME_SW = "pwa9c_3";
 let clilog_active = false;
 
@@ -20,11 +21,11 @@ const config = {
         // "/pwa9c/",
         "/pwa9c/index.html",
 
-        // "/pwa9c/style.less",
-        // "/pwa9c/menu_h.less",
-        // "/pwa9c/uajs/less.js",
-        "/pwa9c/style.css",
-        "/pwa9c/menu_h.css",
+        "/pwa9c/style.less",
+        "/pwa9c/menu_h.less",
+        "/pwa9c/uajs/less.js",
+        // "/pwa9c/style.css",
+        // "/pwa9c/menu_h.css",
 
         "/pwa9c/index.js",
         "/pwa9c/app.js",
@@ -49,6 +50,11 @@ const config = {
         "/pwa9c/imgs/fox3.jpg",
         "/pwa9c/imgs/fox4.jpg",
 
+        "/pwa9c/imgs/disegno800x590.png",
+        "/pwa9c/imgs/giardino800x480.jpg",
+        "/pwa9c/imgs/molo1280x680.jpg",
+
+
         "/pwa9c/sounds/fox1.mp3",
         "/pwa9c/sounds/fox2.mp3",
         "/pwa9c/sounds/fox3.mp3",
@@ -60,6 +66,9 @@ const config = {
         "/pwa9c/favicon.ico"
     ]
 };
+
+
+
 
 self.addEventListener('install', (event) => {
     swlog("install " + config.version);
