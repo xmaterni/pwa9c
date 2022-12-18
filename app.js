@@ -30,22 +30,26 @@ const app_info = function (sw_name, release, state) {
 "use strict"; //jshint ignore:line
 
 
-
-// This variable will save the event for later use.
 let deferredPrompt;
+const addBtn = document.querySelector('.install');
+addBtn.style.display = 'none';
 window.addEventListener('beforeinstallprompt', (e) => {
-  // Prevents the default mini-infobar or install dialog from appearing on mobile
   e.preventDefault();
-  // Save the event because you'll need to trigger it later.
   deferredPrompt = e;
-  // Show your customized install prompt for your PWA
-  // Your own UI doesn't have to be a single element, you
-  // can have buttons in different locations, or wait to prompt
-  // as part of a critical journey.
-  // showInAppInstallPromotion();
-  alert("APP");
+  addBtn.style.display = 'block';
+  addBtn.addEventListener('click', () => {
+    addBtn.style.display = 'none';
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the A2HS prompt');
+      } else {
+        console.log('User dismissed the A2HS prompt');
+      }
+      deferredPrompt = null;
+    });
+  });
 });
-
 
 
 let SW_STATE = "unregistred";
