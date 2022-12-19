@@ -26,22 +26,47 @@ const app_info = function (sw_name, release, state) {
   msg_prn(item0, txt);
 };
 
+const error = (...args) => {
+  console.error('app\n');
+  console.error(...args);
+  console.error('\n');
+};
 
 "use strict"; //jshint ignore:line
 
+const app_inst_id = "app_inst_id";
+
+const open_install = () => {
+  const msg = "Add to home screen";
+  const html = ` <a>${msg}</a>`;
+  const elm = document.createElement("div");
+  document.body.appendChild(elm);
+  elm.innerHTML = html;
+  elm.classList.add("app_install");
+  elm.id = app_inst_id;
+  return elm.querySelector("a");
+};
+
+const close_install = () => {
+  const elm = document.querySelector(app_inst_id);
+  if (!!elm)
+    elm.classList.remove(elm);
+};
+
+close_install();
 
 let deferredPrompt;
-const addBtn = document.querySelector('.install');
-addBtn.style.display = 'none';
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  addBtn.style.display = 'block';
-  addBtn.addEventListener('click', () => {
-    addBtn.style.display = 'none';
+window.addEventListener('beforeinstallprompt', (evn) => {
+  evn.preventDefault();
+  const wnd_inst = open_install();
+  console.log("platform:", evn.platforms);
+  deferredPrompt = evn;
+  wnd_inst.addEventListener('click', () => {
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then((choiceResult) => {
       if (choiceResult.outcome === 'accepted') {
+        close_install();
+        window.reload();
         console.log('User accepted the A2HS prompt');
       } else {
         console.log('User dismissed the A2HS prompt');
@@ -50,6 +75,28 @@ window.addEventListener('beforeinstallprompt', (e) => {
     });
   });
 });
+
+/////////////////////////////////////////////////////
+/*
+<button id="installBtn" onclick="instalar()" disabled > Instalar PWA </button>
+*/
+// var beforeInstallPrompt = null;
+// window.addEventListener("beforeinstallprompt", eventHandler, errorHandler);
+// function eventHandler(event) {
+//   beforeInstallPrompt = event;
+//   document.getElementById("installBtn").removeAttribute("disabled");
+// }
+// function errorHandler(event) {
+//   error(event);
+// }
+// function instalar() {
+//   if (beforeInstallPrompt)
+//     beforeInstallPrompt.prompt();
+// }
+
+
+/////////////////////////////////////////////////////
+
 
 
 let SW_STATE = "unregistred";
@@ -272,7 +319,8 @@ function clearCaches() {
 function reset() {
   clearCaches();
   unregist();
-  app_info(SW_NAME, RELEASE, "unregistred");
+  // app_info(SW_NAME, RELEASE, "unregistred");
+  window.location.reload();
 }
 
 function reload() {

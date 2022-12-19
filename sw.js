@@ -1,12 +1,17 @@
 /*jshint esversion:11 */
 
 // console.log=()=>{};
-// console.eror=()=>{};
 
 const swlog = function (txt) {
     console.log(txt);
     if (clilog_active)
         MessagePusher.ualog(txt);
+};
+
+const error = (...args) => {
+    console.error('\n');
+    console.error(...args);
+    console.error('\n');
 };
 
 "use strict";  //jshint ignore:line
@@ -177,7 +182,7 @@ self.addEventListener('fetch', (event) => {
     else if (strategy == SW_SVR)
         return staleWhileRevalidate(event);
     else {
-        console.err("XXX_0 fetch null");
+        error("XXX_0 fetch null");
         return;
     }
 });
@@ -225,11 +230,11 @@ const cacheFirst = (event) => {
                                 cache.put(event.request, fetchedResponse.clone());
                                 console.log("cacheFirst cahae.put");
                             } else {
-                                console.error("XXX_1 fetchFirst cache.put response:", fetchedResponse);
+                                error("XXX_1 fetchFirst cache.put response:", fetchedResponse);
                             }
                             return fetchedResponse;
                         }).catch((error) => {
-                            console.error("XXX_1 fetchFirst ", error);
+                            error("XXX_1 fetchFirst ", error);
                             return null;
                         });
                 });
@@ -272,7 +277,7 @@ const staleWhileRevalidate = (event) => {
                             .then((networkResponse) => {
                                 cache.put(event.request, networkResponse.clone());
                             }).catch((error) => {
-                                console.error(`"XXX_2 staleWhileRevalidate\n${url}\n`, error);
+                                error(`"XXX_2 staleWhileRevalidate\n${url}\n`, error);
                             });
 
                         return cachedResponse;
@@ -284,7 +289,7 @@ const staleWhileRevalidate = (event) => {
                                 cache.put(event.request, networkResponse.clone());
                                 return networkResponse;
                             }).catch((error) => {
-                                console.error(`"XXX_3 staleWhileRevalidate\n${url}\n`, error);
+                                e.error(`"XXX_3 staleWhileRevalidate\n${url}\n`, error);
                             });
                     }
                 });
@@ -355,7 +360,7 @@ self.addEventListener('message', (event) => {
     catch (err) {
         const s = JSON.stringify(msg);
         const es = `${err}\nmsg:${s}`;
-        console.error(es);
+        error(es);
     }
 });
 

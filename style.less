@@ -1,7 +1,8 @@
+/** @format */
 
-@xindex:#050e84;
-@xbmanifest:#044b47;
-@xcmanifest:#aeb9b2;
+@xindex: #050e84;
+@xbmanifest: #044b47;
+@xcmanifest: #aeb9b2;
 
 html,
 body,
@@ -139,14 +140,39 @@ body {
 @fsize-container: clamp(0.8rem, 1.5vw, 1.5rem);
 // @fsize-container: calc(10px + 1vw);
 
+
+div.app_install {
+  padding: 0;
+  margin:9;
+  background: #cd0000;
+  color:#ffffff;
+  position:absolute;
+  top:100px;
+  left:40%;
+  a {
+    font-size: @fsize-container;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 10px;
+    border: 2px solid inherit;
+    background:inherit;
+    color:inherit;
+  }
+  a:hover {
+    font-style: italic;
+    text-decoration: underline;
+  }
+}
+
+
 span.info {
   font-size: @fsize-container;
   color: @frg-conatainer;
-  padding:0;
-  margin:0;
-  span{
-  padding-right: 50px;
-  // margin-right: 0px !important;
+  padding: 0;
+  margin: 0;
+  span {
+    padding-right: 50px;
+    // margin-right: 0px !important;
   }
 }
 
