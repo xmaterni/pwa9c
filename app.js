@@ -4,7 +4,7 @@
 // console.eror=()=>{};
 
 
-const RELEASE = "0.1.7";
+const RELEASE = "0.1.8";
 const SW_NAME = "/pwa9c/sw.js";
 
 const ualog = function (...args) {
