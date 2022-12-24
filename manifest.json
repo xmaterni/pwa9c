@@ -6,8 +6,8 @@
   "description": "Progressive Web App pwa9c",
   "start_url": "/pwa9c/index.html",
   "display": "standalone",
-  "orientation": "portrait",
-  "theme_color": "#aeb9b2",
+  "orientation": "any",
+  "theme_color": "#050e84",
   "background_color": "#044b47",
   "icons": [
     {
@@ -23,11 +23,6 @@
     {
       "src": "icons/icon07_x192.png",
       "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon07_x144.png",
-      "sizes": "144x144",
       "type": "image/png"
     },
     {
@@ -47,32 +42,14 @@
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "icons/maskable_icon_x144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ],
   "screenshots": [
     {
-      "src": "/pwa9d/disegno800x590.png",
-      "sizes": "800x590",
-      "type": "image/png",
-      "description": "disegno quadro"
-    },
-    {
-      "src": "/pwa9d/giardino800x480.jpg",
+      "src": "imgs/giardino800x480.jpg",
       "sizes": "800x480",
       "type": "image/jpg",
       "description": "giardino viterbo"
-    },
-    {
-      "src": "/pwa9d/molo12800x680.jpg",
-      "sizes": "1280x680",
-      "type": "image/jpg",
-      "description": "molo capodimonte"
     }
   ]
 }

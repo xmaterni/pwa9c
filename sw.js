@@ -43,21 +43,15 @@ const config = {
         "/pwa9c/icons/maskable_icon_x512.png",
         "/pwa9c/icons/maskable_icon_x384.png",
         "/pwa9c/icons/maskable_icon_x192.png",
-        "/pwa9c/icons/maskable_icon_x144.png",
-
         "/pwa9c/icons/icon07_x512.png",
         "/pwa9c/icons/icon07_x384.png",
         "/pwa9c/icons/icon07_x192.png",
-        "/pwa9c/icons/icon07_x144.png",
 
         "/pwa9c/imgs/fox1.jpg",
         "/pwa9c/imgs/fox2.jpg",
         "/pwa9c/imgs/fox3.jpg",
         "/pwa9c/imgs/fox4.jpg",
-
-        "/pwa9c/imgs/disegno800x590.png",
         "/pwa9c/imgs/giardino800x480.jpg",
-        "/pwa9c/imgs/molo1280x680.jpg",
 
 
         "/pwa9c/sounds/fox1.mp3",
